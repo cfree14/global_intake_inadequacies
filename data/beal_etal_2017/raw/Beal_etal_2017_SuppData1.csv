@@ -1,0 +1,168 @@
+Zone,Country,ISO3,  Population  ,  PCDEA  ,  MDI ,  PIMII without Fortification  ,  PIMII including Fortification  ,PIMII Fortification Impact
+Other,Albania,ALB," 3,154,000 "," 3,016 ", 0.99 , 0.91 , 0.75 ,-0.16
+WCANA,Armenia,ARM," 2,964,000 "," 2,802 ", 0.99 , 2.59 , 2.59 ,0.00
+Latin America,Antigua and Barbuda,ATG," 88,000 "," 2,386 ", 0.99 , 6.54 , 5.93 ,-0.61
+WCANA,Kazakhstan,KAZ," 16,098,000 "," 3,104 ", 0.99 , 1.68 , 0.66 ,-1.02
+Other,Serbia,SRB," 9,597,000 "," 2,717 ", 0.99 , 4.60 , 4.60 ,0.00
+Latin America,Bahamas,BHS," 366,000 "," 2,493 ", 0.98 , 8.64 , 8.34 ,-0.30
+WCANA,Cyprus,CYP," 1,117,000 "," 2,633 ", 0.98 , 6.77 , 6.77 ,0.00
+High Income NES,Denmark,DNK," 5,575,000 "," 3,358 ", 0.98 , 1.95 , 1.94 ,-0.01
+High Income NES,Estonia,EST," 1,294,000 "," 3,204 ", 0.98 , 1.40 , 1.40 ,0.00
+High Income NES,Finland,FIN," 5,389,000 "," 3,264 ", 0.98 , 2.56 , 2.56 ,0.00
+High Income NES,Greece,GRC," 11,119,000 "," 3,427 ", 0.98 , 1.14 , 1.14 ,0.00
+Latin America,Grenada,GRD," 105,000 "," 2,451 ", 0.98 , 8.37 , 7.27 ,-1.10
+High Income NES,Iceland,ISL," 322,000 "," 3,305 ", 0.98 , 3.04 , 3.04 ,0.00
+High Income NES,Luxembourg,LUX," 516,000 "," 3,567 ", 0.98 , 1.41 , 1.41 ,0.00
+Other,Macedonia,MKD," 2,104,000 "," 2,917 ", 0.98 , 5.01 , 5.01 ,0.00
+Other,Malta,MLT," 426,000 "," 3,388 ", 0.98 , 1.43 , 1.43 ,0.00
+High Income NES,Netherlands,NLD," 16,666,000 "," 3,143 ", 0.98 , 2.73 , 2.73 ,0.00
+High Income NES,Sweden,SWE," 9,449,000 "," 3,142 ", 0.98 , 3.55 , 3.50 ,-0.05
+WCANA,Uzbekistan,UZB," 28,152,000 "," 2,670 ", 0.98 , 4.93 , 3.02 ,-1.91
+High Income NES,Australia,AUS," 22,741,000 "," 3,250 ", 0.97 , 4.57 , 2.05 ,-2.52
+Other,Belarus,BLR," 9,450,000 "," 3,247 ", 0.97 , 3.77 , 3.77 ,0.00
+East Asia,China,CHN," 1,399,292,000 "," 3,079 ", 0.97 , 5.11 , 5.11 ,0.00
+High Income NES,Lithuania,LTU," 3,044,000 "," 3,453 ", 0.97 , 1.48 , 1.48 ,0.00
+High Income NES,Latvia,LVA," 2,073,000 "," 3,286 ", 0.97 , 2.66 , 2.66 ,0.00
+High Income NES,New Caledonia,NCL," 250,000 "," 2,800 ", 0.97 , 6.88 , 6.88 ,0.00
+Latin America,Barbados,BRB," 282,000 "," 2,998 ", 0.96 , 5.13 , 4.95 ,-0.17
+High Income NES,Canada,CAN," 34,487,000 "," 3,402 ", 0.96 , 2.71 , 2.21 ,-0.49
+High Income NES,Switzerland,CHE," 7,915,000 "," 3,485 ", 0.96 , 4.35 , 4.35 ,0.00
+High Income NES,Spain,ESP," 46,514,000 "," 3,182 ", 0.96 , 4.65 , 4.65 ,0.00
+High Income NES,United Kingdom,GBR," 62,672,000 "," 3,393 ", 0.96 , 3.23 , 3.16 ,-0.07
+Latin America,Guyana,GUY," 791,000 "," 2,635 ", 0.96 , 7.43 , 6.37 ,-1.06
+High Income NES,Ireland,IRL," 4,523,000 "," 3,584 ", 0.96 , 1.31 , 1.31 ,0.00
+WCANA,Israel,ISR," 7,542,000 "," 3,615 ", 0.96 , 0.99 , 0.99 ,0.00
+Latin America,Jamaica,JAM," 2,755,000 "," 2,765 ", 0.96 , 5.88 , 5.48 ,-0.41
+WCANA,Kyrgyzstan,KGZ," 5,403,000 "," 2,825 ", 0.96 , 4.12 , 1.97 ,-2.15
+High Income NES,New Zealand,NZL," 4,414,000 "," 3,164 ", 0.96 , 5.36 , 3.84 ,-1.52
+Other,Romania,ROU," 21,809,000 "," 3,358 ", 0.96 , 2.97 , 2.97 ,0.00
+Latin America,Uruguay,URY," 3,383,000 "," 2,936 ", 0.96 , 6.39 , 3.14 ,-3.25
+Latin America,Saint Vincent and the Grenadines,VCT," 109,000 "," 2,921 ", 0.96 , 5.47 , 5.27 ,-0.20
+Latin America,Argentina,ARG," 40,729,000 "," 3,153 ", 0.95 , 7.63 , 3.86 ,-3.77
+High Income NES,Belgium,BEL," 11,007,000 "," 3,788 ", 0.95 , 1.85 , 1.84 ,-0.01
+Other,Bosnia and Herzegovina,BIH," 3,839,000 "," 3,120 ", 0.95 , 6.06 , 6.06 ,0.00
+Subsaharan Africa,Cape Verde,CPV," 491,000 "," 2,706 ", 0.95 , 7.42 , 4.40 ,-3.02
+Latin America,Ecuador,ECU," 15,246,000 "," 2,473 ", 0.95 , 15.29 , 6.16 ,-9.13
+High Income NES,France,FRA," 63,582,000 "," 3,518 ", 0.95 , 3.19 , 3.19 ,0.00
+High Income NES,Hungary,HUN," 9,996,000 "," 2,965 ", 0.95 , 8.48 , 8.48 ,0.00
+High Income NES,Italy,ITA," 60,729,000 "," 3,536 ", 0.95 , 2.48 , 2.48 ,0.00
+Latin America,Saint Lucia,LCA," 179,000 "," 2,611 ", 0.95 , 11.31 , 10.63 ,-0.68
+South Asia,Maldives,MDV," 332,000 "," 2,706 ", 0.95 , 8.12 , 8.12 ,0.00
+High Income NES,Norway,NOR," 4,944,000 "," 3,395 ", 0.95 , 3.03 , 3.03 ,0.00
+WCANA,Oman,OMN," 3,025,000 "," 3,077 ", 0.95 , 4.52 , 4.52 ,0.00
+Latin America,Peru,PER," 29,615,000 "," 2,633 ", 0.95 , 8.89 , 6.49 ,-2.40
+High Income NES,Portugal,PRT," 10,598,000 "," 3,448 ", 0.95 , 3.66 , 3.66 ,0.00
+Other,French Polynesia,PYF," 271,000 "," 2,854 ", 0.95 , 10.73 , 10.73 ,0.00
+WCANA,Sudan,SDN," 43,552,000 "," 2,337 ", 0.95 , 9.91 , 5.20 ,-4.70
+High Income NES,Slovenia,SVN," 2,062,000 "," 3,158 ", 0.95 , 5.86 , 5.86 ,0.00
+Other,Ukraine,UKR," 45,803,000 "," 3,142 ", 0.95 , 4.58 , 4.58 ,0.00
+WCANA,United Arab Emirates,ARE," 8,925,000 "," 3,201 ", 0.94 , 6.59 , 6.29 ,-0.29
+High Income NES,Czech Republic,CZE," 10,611,000 "," 3,288 ", 0.94 , 5.65 , 5.65 ,0.00
+High Income NES,Croatia,HRV," 4,324,000 "," 3,050 ", 0.94 , 6.73 , 6.73 ,0.00
+WCANA,Lebanon,LBN," 4,478,000 "," 3,176 ", 0.94 , 5.17 , 5.17 ,0.00
+East Asia,Mongolia,MNG," 2,754,000 "," 2,447 ", 0.94 , 13.66 , 10.06 ,-3.61
+High Income NES,Poland,POL," 38,205,000 "," 3,481 ", 0.94 , 4.01 , 4.01 ,0.00
+High Income NES,Russia,RUS," 143,438,000 "," 3,359 ", 0.94 , 3.80 , 3.80 ,0.00
+High Income NES,Slovakia,SVK," 5,440,000 "," 2,893 ", 0.94 , 10.57 , 10.57 ,0.00
+High Income NES,United States,USA," 314,912,000 "," 3,638 ", 0.94 , 3.33 , 1.26 ,-2.07
+WCANA,Azerbaijan,AZE," 9,202,000 "," 2,943 ", 0.93 , 8.69 , 3.86 ,-4.83
+Latin America,Brazil,BRA," 196,935,000 "," 3,283 ", 0.93 , 5.63 , 4.81 ,-0.82
+Latin America,Cuba,CUB," 11,276,000 "," 3,276 ", 0.93 , 5.82 , 4.17 ,-1.64
+High Income NES,Germany,DEU," 82,893,000 "," 3,528 ", 0.93 , 4.48 , 4.48 ,0.00
+East Asia,Japan,JPN," 127,319,000 "," 2,711 ", 0.93 , 15.35 , 15.35 ,0.00
+East Asia,South Korea,KOR," 48,733,000 "," 3,331 ", 0.93 , 6.74 , 6.74 ,0.00
+WCANA,Kuwait,KWT," 3,125,000 "," 3,459 ", 0.93 , 3.70 , 2.96 ,-0.74
+WCANA,Turkmenistan,TKM," 5,107,000 "," 2,884 ", 0.93 , 9.05 , 7.63 ,-1.42
+Latin America,Trinidad and Tobago,TTO," 1,333,000 "," 2,889 ", 0.93 , 8.61 , 8.23 ,-0.38
+High Income NES,Austria,AUT," 8,433,000 "," 3,779 ", 0.92 , 4.77 , 4.77 ,0.00
+Latin America,Belize,BLZ," 316,000 "," 2,742 ", 0.92 , 10.10 , 8.33 ,-1.77
+Latin America,Chile,CHL," 17,308,000 "," 2,992 ", 0.92 , 10.70 , 7.90 ,-2.80
+Latin America,Costa Rica,CRI," 4,738,000 "," 2,903 ", 0.92 , 10.37 , 1.15 ,-9.23
+Southeast Asia,Myanmar,MMR," 52,351,000 "," 2,531 ", 0.92 , 17.82 , 17.82 ,0.00
+Latin America,Paraguay,PRY," 6,573,000 "," 2,611 ", 0.92 , 12.58 , 7.95 ,-4.63
+Latin America,Dominican Republic,DOM," 10,148,000 "," 2,563 ", 0.91 , 18.03 , 12.57 ,-5.46
+WCANA,Turkey,TUR," 73,059,000 "," 3,681 ", 0.91 , 5.26 , 5.26 ,0.00
+Southeast Asia,Brunei,BRN," 407,000 "," 2,916 ", 0.90 , 14.32 , 14.32 ,0.00
+Subsaharan Africa,Republic of Congo,COG," 4,225,000 "," 2,175 ", 0.90 , 24.18 , 23.38 ,-0.79
+WCANA,Algeria,DZA," 37,763,000 "," 3,212 ", 0.90 , 9.05 , 9.05 ,0.00
+Southeast Asia,Fiji,FJI," 868,000 "," 2,924 ", 0.90 , 12.39 , 9.14 ,-3.25
+Subsaharan Africa,Gabon,GAB," 1,594,000 "," 2,768 ", 0.90 , 12.01 , 12.01 ,0.00
+WCANA,Iran,IRN," 75,424,000 "," 3,055 ", 0.90 , 9.66 , 9.09 ,-0.57
+Other,Moldova,MDA," 3,543,000 "," 2,828 ", 0.90 , 16.87 , 6.78 ,-10.09
+Subsaharan Africa,Mauritius,MUS," 1,235,000 "," 3,049 ", 0.90 , 11.35 , 11.35 ,0.00
+WCANA,Tunisia,TUN," 10,753,000 "," 3,358 ", 0.90 , 7.71 , 7.71 ,0.00
+Latin America,Bolivia,BOL," 10,324,000 "," 2,251 ", 0.89 , 23.87 , 12.07 ,-11.80
+Latin America,Colombia,COL," 47,079,000 "," 2,694 ", 0.89 , 17.20 , 8.81 ,-8.39
+Subsaharan Africa,Kenya,KEN," 42,028,000 "," 2,173 ", 0.89 , 22.90 , 7.90 ,-15.00
+Southeast Asia,Malaysia,MYS," 28,759,000 "," 2,854 ", 0.89 , 16.18 , 16.00 ,-0.18
+Subsaharan Africa,Namibia,NAM," 2,218,000 "," 2,084 ", 0.89 , 28.09 , 28.09 ,0.00
+Latin America,Panama,PAN," 3,740,000 "," 2,633 ", 0.89 , 19.35 , 8.03 ,-11.31
+WCANA,Saudi Arabia,SAU," 27,762,000 "," 3,100 ", 0.89 , 10.36 , 8.05 ,-2.32
+WCANA,Tajikistan,TJK," 7,815,000 "," 2,100 ", 0.89 , 27.13 , 27.13 ,0.00
+Southeast Asia,Vanuatu,VUT," 242,000 "," 2,813 ", 0.89 , 13.36 , 13.36 ,0.00
+Subsaharan Africa,Angola,AGO," 20,180,000 "," 2,404 ", 0.88 , 19.58 , 19.58 ,0.00
+Other,Bulgaria,BGR," 7,333,000 "," 2,872 ", 0.88 , 18.43 , 10.75 ,-7.68
+Subsaharan Africa,Botswana,BWA," 1,987,000 "," 2,263 ", 0.88 , 29.47 , 29.47 ,0.00
+Subsaharan Africa,Central African Republic,CAF," 4,436,000 "," 2,149 ", 0.88 , 27.02 , 27.02 ,0.00
+Subsaharan Africa,Rwanda,RWA," 11,144,000 "," 2,145 ", 0.88 , 19.17 , 10.90 ,-8.27
+Southeast Asia,Solomon Islands,SLB," 538,000 "," 2,463 ", 0.88 , 19.75 , 17.92 ,-1.83
+Latin America,El Salvador,SLV," 6,256,000 "," 2,504 ", 0.88 , 23.61 , 11.09 ,-12.52
+Subsaharan Africa,Uganda,UGA," 35,148,000 "," 2,275 ", 0.88 , 18.41 , 5.14 ,-13.27
+Other,Samoa,WSM," 187,000 "," 2,861 ", 0.88 , 15.98 , 15.98 ,0.00
+Subsaharan Africa,Cameroon,CMR," 21,156,000 "," 2,580 ", 0.87 , 17.24 , 10.86 ,-6.38
+Latin America,Haiti,HTI," 10,033,000 "," 2,095 ", 0.87 , 32.50 , 23.50 ,-9.00
+WCANA,Jordan,JOR," 6,731,000 "," 3,144 ", 0.87 , 11.72 , 2.44 ,-9.28
+Latin America,Mexico,MEX," 119,361,000 "," 3,026 ", 0.87 , 14.35 , 5.83 ,-8.53
+Subsaharan Africa,Mali,MLI," 14,417,000 "," 2,829 ", 0.87 , 13.74 , 4.88 ,-8.85
+Subsaharan Africa,Niger,NER," 16,511,000 "," 2,545 ", 0.87 , 16.19 , 12.29 ,-3.89
+South Asia,Pakistan,PAK," 176,166,000 "," 2,425 ", 0.87 , 24.47 , 21.79 ,-2.68
+Latin America,Venezuela,VEN," 29,501,000 "," 2,873 ", 0.87 , 16.12 , 9.22 ,-6.90
+Southeast Asia,Vietnam,VNM," 89,914,000 "," 2,716 ", 0.87 , 20.45 , 15.05 ,-5.40
+Subsaharan Africa,Djibouti,DJI," 847,000 "," 2,514 ", 0.86 , 24.24 , 14.18 ,-10.06
+WCANA,Georgia,GEO," 4,374,000 "," 2,718 ", 0.86 , 23.39 , 23.39 ,0.00
+Subsaharan Africa,Ghana,GHA," 24,821,000 "," 2,998 ", 0.86 , 13.74 , 7.19 ,-6.56
+WCANA,Morocco,MAR," 32,059,000 "," 3,329 ", 0.86 , 12.78 , 11.16 ,-1.61
+WCANA,Egypt,EGY," 79,392,000 "," 3,551 ", 0.85 , 11.18 , 9.11 ,-2.06
+Subsaharan Africa,Mauritania,MRT," 3,703,000 "," 2,782 ", 0.85 , 18.53 , 10.94 ,-7.59
+Latin America,Suriname,SUR," 530,000 "," 2,711 ", 0.85 , 23.34 , 19.80 ,-3.54
+Latin America,Honduras,HND," 7,777,000 "," 2,639 ", 0.84 , 25.47 , 11.10 ,-14.37
+South Asia,India,IND," 1,221,156,000 "," 2,446 ", 0.84 , 28.09 , 28.05 ,-0.05
+South Asia,Nepal,NPL," 27,156,000 "," 2,610 ", 0.84 , 21.04 , 11.61 ,-9.43
+Southeast Asia,Philippines,PHL," 95,053,000 "," 2,567 ", 0.84 , 24.93 , 19.77 ,-5.16
+Subsaharan Africa,Sao Tome and Principe,STP," 183,000 "," 2,670 ", 0.84 , 21.69 , 21.69 ,0.00
+Southeast Asia,Thailand,THA," 66,576,000 "," 2,756 ", 0.84 , 26.01 , 23.97 ,-2.04
+Subsaharan Africa,Côte d’Ivoire,CIV," 19,390,000 "," 2,780 ", 0.83 , 21.48 , 10.91 ,-10.57
+Latin America,Guatemala,GTM," 14,707,000 "," 2,483 ", 0.83 , 25.47 , 12.99 ,-12.48
+Southeast Asia,Laos,LAO," 6,521,000 "," 2,355 ", 0.83 , 29.23 , 29.23 ,0.00
+East Asia,North Korea,PRK," 24,631,000 "," 2,100 ", 0.83 , 38.17 , 38.17 ,0.00
+Subsaharan Africa,Sierra Leone,SLE," 5,865,000 "," 2,330 ", 0.83 , 29.94 , 29.94 ,0.00
+Other,Kiribati,KIR," 99,000 "," 3,013 ", 0.82 , 20.21 , 20.21 ,0.00
+WCANA,Afghanistan,AFG," 29,105,000 "," 2,106 ", 0.81 , 35.63 , 34.14 ,-1.49
+Subsaharan Africa,Ethiopia,ETH," 89,393,000 "," 2,102 ", 0.81 , 32.85 , 32.85 ,0.00
+South Asia,Sri Lanka,LKA," 20,926,000 "," 2,489 ", 0.81 , 36.18 , 36.18 ,0.00
+Subsaharan Africa,Tanzania,TZA," 46,355,000 "," 2,198 ", 0.81 , 30.57 , 18.47 ,-12.11
+Subsaharan Africa,South Africa,ZAF," 51,949,000 "," 2,999 ", 0.81 , 23.19 , 7.92 ,-15.27
+Subsaharan Africa,Benin,BEN," 9,780,000 "," 2,591 ", 0.80 , 26.11 , 14.31 ,-11.80
+Subsaharan Africa,Guinea,GIN," 11,162,000 "," 2,550 ", 0.80 , 26.97 , 17.90 ,-9.07
+Subsaharan Africa,Nigeria,NGA," 164,193,000 "," 2,702 ", 0.80 , 25.02 , 10.77 ,-14.25
+Subsaharan Africa,Swaziland,SWZ," 1,212,000 "," 2,266 ", 0.80 , 38.98 , 38.98 ,0.00
+Subsaharan Africa,Chad,TCD," 12,080,000 "," 2,059 ", 0.80 , 34.73 , 34.73 ,0.00
+Latin America,Nicaragua,NIC," 5,905,000 "," 2,552 ", 0.79 , 35.53 , 18.87 ,-16.65
+WCANA,Iraq,IRQ," 31,837,000 "," 2,489 ", 0.78 , 31.65 , 25.60 ,-6.05
+WCANA,Yemen,YEM," 23,304,000 "," 2,199 ", 0.78 , 40.68 , 31.40 ,-9.28
+Subsaharan Africa,Madagascar,MDG," 21,679,000 "," 2,083 ", 0.77 , 47.05 , 47.05 ,0.00
+Subsaharan Africa,Senegal,SEN," 13,331,000 "," 2,421 ", 0.77 , 37.65 , 17.74 ,-19.92
+Southeast Asia,Timor-Leste,TLS," 1,096,000 "," 2,073 ", 0.77 , 43.74 , 43.74 ,0.00
+Subsaharan Africa,Burkina Faso,BFA," 15,995,000 "," 2,659 ", 0.76 , 31.65 , 25.81 ,-5.83
+Southeast Asia,Cambodia,KHM," 14,606,000 "," 2,405 ", 0.76 , 43.60 , 43.60 ,0.00
+Subsaharan Africa,Gambia,GMB," 1,735,000 "," 2,845 ", 0.75 , 31.44 , 20.23 ,-11.21
+Southeast Asia,Indonesia,IDN," 243,802,000 "," 2,709 ", 0.75 , 39.46 , 20.72 ,-18.73
+Subsaharan Africa,Mozambique,MOZ," 24,581,000 "," 2,256 ", 0.75 , 39.37 , 39.37 ,0.00
+Subsaharan Africa,Malawi,MWI," 15,458,000 "," 2,333 ", 0.75 , 35.40 , 7.72 ,-27.67
+Subsaharan Africa,Togo,TGO," 6,472,000 "," 2,361 ", 0.75 , 38.72 , 20.40 ,-18.33
+Subsaharan Africa,Zambia,ZMB," 13,634,000 "," 1,906 ", 0.75 , 49.87 , 10.27 ,-39.60
+Subsaharan Africa,Guinea-Bissau,GNB," 1,624,000 "," 2,305 ", 0.71 , 46.70 , 42.51 ,-4.19
+Subsaharan Africa,Lesotho,LSO," 2,030,000 "," 2,593 ", 0.71 , 40.86 , 40.86 ,0.00
+Subsaharan Africa,Zimbabwe,ZWE," 13,359,000 "," 2,196 ", 0.71 , 51.97 , 51.97 ,0.00
+South Asia,Bangladesh,BGD," 152,862,000 "," 2,427 ", 0.68 , 52.91 , 52.91 ,0.00
+Subsaharan Africa,Liberia,LBR," 4,080,000 "," 2,250 ", 0.66 , 57.30 , 57.30 ,0.00
