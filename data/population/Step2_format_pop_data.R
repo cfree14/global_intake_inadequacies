@@ -43,5 +43,5 @@ ggplot(stats, aes(x=year, y=npeople)) +
 ################################################################################
 
 # Read data
-saveRDS(data, file=file.path(datadir, "WB_1960_2020_population_size_by_country_agesex_full.Rds"))
+saveRDS(data, file=file.path(datadir, "WB_1960_2020_population_size_by_country_agesex.Rds"))
 
