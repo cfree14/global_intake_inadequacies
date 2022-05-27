@@ -53,6 +53,13 @@ agesex_key_genus <- genus_orig %>%
 pop <- pop_orig %>%
   rename(age_range=age)
 
+# Continent key
+cntry_key <- genus_orig %>%
+  select(iso3) %>% unique() %>%
+  mutate(continent=countrycode::countrycode(iso3, "iso3c", "continent"),
+         continent=case_when(iso3=="NDA" ~ "Americas",
+                             T ~ continent))
+
 # Separate children and non-children data;
 # duplicate children;
 # merge and sort
@@ -65,7 +72,11 @@ genus_child_m <- genus_child %>%
 genus_child_f <- genus_child %>%
   mutate(sex="Females")
 genus <- bind_rows(genus_mf, genus_child_m, genus_child_f) %>%
-  arrange(iso3, nutrient, sex, age_range, year)
+  # Add continent
+  left_join(cntry_key, by="iso3") %>%
+  # Arrange
+  select(continent, everything()) %>%
+  arrange(continent, iso3, nutrient, sex, age_range, year)
 
 # Format ARs
 ars <- ars_orig %>%
