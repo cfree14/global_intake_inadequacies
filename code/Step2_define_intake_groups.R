@@ -16,6 +16,7 @@ library(factoextra)
 # Directories
 datadir <- "data"
 plotdir <- "figures"
+outdir <- "output"
 
 # Get distributions
 dists_orig <- nutriR::dists_full
@@ -84,6 +85,9 @@ diff_df <- diss_mat %>%
   mutate(iso1=factor(iso1, levels=cntry_key$iso3),
          iso2=factor(iso2, levels=cntry_key$iso3))
 
+# Export dissimilarity matrix
+saveRDS(diff_df, file=file.path(outdir, "GENUS_country_dissimilarity.Rds"))
+
 # Plot dissimilarity
 g <- ggplot(diff_df, aes(x=iso1, y=iso2, fill=diss)) +
   geom_raster(alpha=0.7) +
@@ -115,6 +119,8 @@ g
 # Export figure
 ggsave(g, filename=file.path(plotdir, "FigSX_genus_diss_matrix.png"),
        width=6.5, height=6.5, units="in", dpi=600)
+
+
 
 
 # Search for best match

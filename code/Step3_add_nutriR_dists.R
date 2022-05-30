@@ -20,6 +20,10 @@ data_orig <- readRDS(file=file.path(outdir, "1961_2011_subnational_nutrient_inta
 # Get distributions
 dists_orig <- nutriR::dists_full
 
+# Read GENuS dissimilarity matrix
+diss_matrix <- readRDS(file=file.path(outdir, "GENUS_country_dissimilarity.Rds"))
+
+
 # To-do list
 # 1) Function to shift distribution to match medians (I think current is for means)
 # 2) Figure out procedure for adding reference dist id
@@ -86,6 +90,13 @@ data1 <- data %>%
   # Create column indicating the distribution id used to describe shape
   mutate(dist_id_shape=ifelse(shape_source=="Known", dist_id, NA))
 
+# Examine imputation types
+table(data1$shape_source)
+
+
+# 1. Nearest age within sex
+#######################################
+
 # Function to find closest age group with data
 dist_id <- "Calcium-ROU-Females-80+" #"Calcium-MOZ-Females-15-19" # "Calcium-MOZ-Females-0-4"
 df <- data1
@@ -128,8 +139,6 @@ find_closest_age_group_w_data <- function(df, dist_id){
 
 }
 
-
-
 # First imputation: closest age group
 data2 <- data1 %>%
   filter(nutrient=="Calcium") %>%
@@ -137,7 +146,11 @@ data2 <- data1 %>%
   mutate(dist_id_shape=ifelse(shape_source=="From closest age group", find_closest_age_group_w_data(., dist_id), dist_id_shape)) %>%
   ungroup()
 
-# Function to find id of oppositie sex
+
+# 2. From opposite sex
+#######################################
+
+# Function to find id of opposite sex
 df <- data2
 dist_id <- "Calcium-ETH-Males-15-19"
 find_id_of_opposite_sex <- function(df, dist_id){
@@ -157,17 +170,120 @@ find_id_of_opposite_sex <- function(df, dist_id){
 
 }
 
-
-
-# Second imputation
+# Second imputation: from opposite sex
 data3 <- data2 %>%
   rowwise() %>%
   mutate(dist_id_shape=ifelse(shape_source=="From opposite sex", find_id_of_opposite_sex(., dist_id), dist_id_shape)) %>%
   ungroup()
 
+# 3. From nearest country
+#######################################
 
-# Examine imputation types
-table(data1$shape_source)
+df <- data3
+dist_id <- "Calcium-AGO-Females-80+"
+find_id_of_nearest_cntry <- function(df, dist_id){
+
+  # Extract info
+  nutrient_do <- strsplit(dist_id, split="-")[[1]][1]
+  iso_do <- strsplit(dist_id, split="-")[[1]][2]
+  sex_do <- strsplit(dist_id, split="-")[[1]][3]
+  age_do <- paste(strsplit(dist_id, split="-")[[1]][4], strsplit(dist_id, split="-")[[1]][5], sep="-")
+  if(age_do=="80+-NA"){age_do <- "80+"}
+
+  # Identify countries with info for this nutrient
+  isos_w_data <- dists_orig %>%
+    filter(nutrient==nutrient_do) %>% pull(iso3) %>% unique()
+
+  # Identify most similar country among countries with info
+  most_similar_iso <- diss_matrix %>%
+    filter(iso1==iso_do & iso2 %in% isos_w_data) %>%
+    arrange(diss) %>% slice(1) %>% pull(iso2) %>% as.character()
+
+  # Extract distribution id used for sex-age from most similar country
+  dist_use <- try(df %>%
+    filter(nutrient==nutrient_do & iso3==most_similar_iso & sex==sex_do & age_range==age_do) %>%
+    pull(dist_id_shape))
+
+  # If none
+  if(length(dist_use)==0 | inherits(dist_use, "try-error")){
+    dist_use <- NA
+  }
+
+  # Return
+  return(dist_use)
+
+}
+
+# Third imputation: from opposite sex
+data4 <- data3 %>%
+  rowwise() %>%
+  mutate(dist_id_shape=ifelse(shape_source=="From most similar country", find_id_of_nearest_cntry(., dist_id), dist_id_shape)) %>%
+  ungroup()
+
+
+# Add distribution info
+################################################################################
+
+# Add dist info
+data5 <- data4 %>%
+  # Add distribution info
+  left_join(dists, by=c("dist_id_shape"="dist_id"))
+
+# Do gammas
+data5_gamma <- data5 %>%
+  # Reduce to gammas
+  filter(best_dist=="gamma") %>%
+  # Shift parameters
+  rowwise() %>%
+  mutate(g_shape_shift=nutriR::shift_dist(shape=g_shape, rate=g_rate, to=supply_agesex_med, plot=F)$shape,
+         g_rate_shift=nutriR::shift_dist(shape=g_shape, rate=g_rate, to=supply_agesex_med, plot=F)$rate) %>%
+  ungroup() %>%
+  # Calculate intake inadequacy
+  rowwise() %>%
+  mutate(sev=nutriR::sev(ear = ar, cv = 0.10, shape=g_shape_shift, rate=g_rate_shift, plot=F)) %>%
+  ungroup() %>%
+  # Calculate number of people with inadeuate intakes
+  mutate(ndeficient=npeople*sev/100)
+
+# Do gammas
+data5_lognormal <- data5 %>%
+  # Reduce to lognormals
+  filter(best_dist=="log-normal") %>%
+  # Shift parameters
+  rowwise() %>%
+  mutate(ln_meanlog_shift=nutriR::shift_dist(meanlog=ln_meanlog, sdlog=ln_sdlog, to=supply_agesex_med, plot=F)$meanlog,
+         ln_sdlog_shift=nutriR::shift_dist(meanlog=ln_meanlog, sdlog=ln_sdlog, to=supply_agesex_med, plot=F)$sdlog) %>%
+  ungroup() %>%
+  # Calculate intake inadequacy
+  rowwise() %>%
+  mutate(sev=nutriR::sev(ear = ar, cv = 0.10, meanlog=ln_meanlog_shift, sdlog=ln_sdlog_shift, plot=F)) %>%
+  ungroup() %>%
+  # Calculate number of people with inadeuate intakes
+  mutate(ndeficient=npeople*sev/100)
+
+# Merge
+data6 <- bind_rows(data5_gamma, data5_lognormal) %>%
+  # Arrange
+  arrange(nutrient, continent, country, sex, age_range)
+
+
+# Export data
+saveRDS(data6, "2011_subnational_nutrient_intake_inadequacy_estimates_full.Rds")
+
+
+# Simplify
+################################################################################
+
+# Simplify data
+data6_simple <- data6 %>%
+  # Select
+  select(continent, iso3, country, nutrient, units_short, sex, age_range, year,
+         supply_agesex_med, ar, ar_source, sev, npeople, ndeficient) %>%
+  # Rename
+  rename(units=units_short, intake=supply_agesex_med)
+
+# Export simplified data
+saveRDS(data6_simple, "2011_subnational_nutrient_intake_inadequacy_estimates_simple.Rds")
 
 
 
@@ -175,7 +291,7 @@ table(data1$shape_source)
 ################################################################################
 
 # Plot imputation rate
-data_do=data1; nutrient="Calcium"
+data_do=data1; nutrient="Zinc"
 plot_impute_rate <- function(data_do=data1, nutrient="Calcium"){
 
   # Subset data
