@@ -16,22 +16,29 @@ genusdir <- "data/genus/processed"
 hdidir <- "data/human_development_index"
 outdir <- "output"
 plotdir <- "figures"
+tabledir <- "tables"
 
 # Read GENuS data
-genus_orig <- readRDS(file.path(genusdir, "GENUS_1961_2011_country_agesex_nutrient_intakes.Rds"))
+genus_orig_full <- readRDS(file.path(genusdir, "GENUS_1961_2011_country_agesex_nutrient_intakes.Rds"))
 
 # Read population data
 pop_orig <- readRDS(file.path(popdir, "WB_1960_2020_population_size_by_country_agesex.Rds"))
 
 # Read HDI
-hdi_orig <- readRDS(file.path(hdidir, "UNDP_2020_human_development_index.Rds"))
+hdi_orig <- readRDS(file.path(hdidir, "UNDP_2020_human_development_index.Rds")) %>%
+  mutate(hdi_catg=as.character(hdi_catg))
 
 # Get ARs
 ars_orig <- nutriR::nrvs
 
 
-# Format data
+# Format GENUS data
 ################################################################################
+
+# Format GENUS data
+genus_orig <- genus_orig_full %>%
+  # Reduce to 2011
+  filter(year==2011)
 
 # Inspect population age/sex key
 agesex_key_pop <- pop_orig %>%
@@ -48,21 +55,16 @@ agesex_key_genus <- genus_orig %>%
 # Based on this, you'll have to do the following formatting:
 # (1) Rename age as age range in the pop key
 # (2) Duplicate the children rows in GENUS and turn into male and female rows
+# (3) Also, add continent to GENUS data
 
 # Format population data
 pop <- pop_orig %>%
-  rename(age_range=age)
+  rename(age_range=age) %>%
+  filter(year==2011)
+sum(pop$npeople, na.rm=T) / 1e9
 
-# Continent key
-cntry_key <- genus_orig %>%
-  select(iso3) %>% unique() %>%
-  mutate(continent=countrycode::countrycode(iso3, "iso3c", "continent"),
-         continent=case_when(iso3=="NDA" ~ "Americas",
-                             T ~ continent))
-
-# Separate children and non-children data;
-# duplicate children;
-# merge and sort
+# Format GENUS data
+# (1) Separate children and non-children data; (2) duplicate children into males/females; (3) merge and sort
 genus_child <- genus_orig %>%
   filter(sex=="Children")
 genus_mf <- genus_orig %>%
@@ -72,15 +74,27 @@ genus_child_m <- genus_child %>%
 genus_child_f <- genus_child %>%
   mutate(sex="Females")
 genus <- bind_rows(genus_mf, genus_child_m, genus_child_f) %>%
-  # Add continent
-  left_join(cntry_key, by="iso3") %>%
-  # Arrange
-  select(continent, everything()) %>%
   arrange(continent, iso3, nutrient, sex, age_range, year)
+
+
+# Expand GENUS data
+################################################################################
+
+# Which countries have population data but not GENuS data?
+isos_genus <- sort(unique(genus$iso3))
+isos2match <- pop_orig %>%
+  select(iso3, country) %>%
+  unique() %>%
+  filter(!iso3 %in% isos_genus)
+write.csv(isos2match, file=file.path(tabledir, "TableSX_countries_without_genus_data.csv"), row.names=F)
+
+
+# Format ARs
+################################################################################
 
 # Format ARs
 ars <- ars_orig %>%
-  # Filter
+  # Reduce to ARs and eliminate stafes
   filter(nrv_type=="Average requirement" & !stage%in%c("Lactation", "Pregnancy")) %>%
   # Simplify
   select(nutrient, units, source, sex, age_group, nrv, nrv_note) %>%
@@ -91,7 +105,10 @@ ars <- ars_orig %>%
          units=case_when(nutrient=="Copper" ~ "mg",
                          units=="ug RAE" ~ "µg RAE",
                          units=="ug DFE" ~ "µg DFE",
-                         T ~ units))
+                         T ~ units)) %>%
+  # Add AR CV
+  mutate(ar_cv=ifelse(nutrient=="Vitamin B12", 0.25, 0.10)) %>%
+  select(nutrient:ar, ar_cv, ar_note, everything())
 
 # Split children into males/females
 ars_mf <- ars %>%
@@ -115,6 +132,14 @@ data <- genus %>%
   left_join(pop %>% select(-country), by=c("iso3", "year", "sex", "age_range")) %>%
   # Add HDI
   left_join(hdi_orig %>% select(-country), by="iso3") %>%
+  # Assign an HDI to countries missing an HDI category
+  mutate(hdi_catg=case_when(iso3=="BMU" ~ "High",
+                            iso3=="NDA" ~ "High",
+                            iso3=="NCL" ~ "Medium",
+                            iso3=="PYF" ~ "Medium",
+                            iso3=="SOM" ~ "Low",
+                            iso3=="PRK" ~ "Low",
+                            T ~ hdi_catg)) %>%
   # Add ARs
   # Recode nutrient for matching to ARs
   mutate(nutrient_ar=case_when(nutrient=="Iron" & hdi_catg=="Low" ~ "Iron (low absorption)",
@@ -148,11 +173,31 @@ data <- genus %>%
                               "80+"=">70 y")) %>%
   # Fix iron and zinc age groups
   mutate(age_range_ar=ifelse(nutrient=="Zinc" & age_range %in% c("25-29", "30-34", "35-39", "40-44", "45-49"), "25-50 y", age_range_ar),
-         age_range_ar=ifelse(nutrient=="Iron" & age_range %in% c("25-29", "30-34", "35-39", "40-44", "45-49"), "25-50 y", age_range_ar),) %>%
+         age_range_ar=ifelse(nutrient=="Iron" & age_range %in% c("25-29", "30-34", "35-39", "40-44", "45-49"), "25-50 y", age_range_ar)) %>%
   # Add AR
   left_join(ars_use, by=c("nutrient_ar"="nutrient", "sex", "age_range_ar"="age_range")) %>%
   # Refactor age range
   mutate(age_range=factor(age_range, levels=levels(genus$age_range)))
+
+
+# Build country key
+################################################################################
+
+# Country key
+cntry_key <- data %>%
+  # Reduce to single nutrient (so population doesn't get double counted)
+  filter(nutrient=="Calcium") %>%
+  # Summarize
+  group_by(continent, country, iso3, hdi, hdi_catg) %>%
+  summarize(npeople=sum(npeople),
+            genus_yn=sum(!is.na(supply_agesex_med)) >0 ) %>%
+  ungroup()
+
+sum(cntry_key$npeople, na.rm=T) / 1e9
+sum(pop$npeople, na.rm=T) / 1e9 - sum(cntry_key$npeople, na.rm=T) / 1e9
+
+# Export
+write.csv(cntry_key, file=file.path(outdir, "country_key.csv"), row.names=F)
 
 
 # Check data
@@ -164,7 +209,7 @@ data %>%
   pull(iso3) %>%
   unique() %>% sort()
 
-# The following ISOs in GENUS do not have a human development index
+# The following ISOs in GENUS do not have a human development index (but I updated the catg)
 data %>%
   filter(is.na(hdi)) %>%
   pull(iso3) %>%

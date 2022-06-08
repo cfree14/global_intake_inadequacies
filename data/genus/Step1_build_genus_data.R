@@ -21,6 +21,13 @@ data_agesex <- GENuS::genus_nutr_agesex_2011
 # Build scalar key
 ################################################################################
 
+# Continent key
+cntry_key <- data_cntry_orig %>%
+  select(iso3) %>% unique() %>%
+  mutate(continent=countrycode::countrycode(iso3, "iso3c", "continent"),
+         continent=case_when(iso3=="NDA" ~ "Americas",
+                             T ~ continent))
+
 # 2011 country wide median supply
 data_cntry_2011 <- data_cntry_orig %>%
   # Simplify
@@ -51,9 +58,15 @@ data <- data_cntry_orig %>%
   mutate(units_short=recode(units_short,
                             "microgram"="µg",
                             "microgram RAE"="µg RAE")) %>%
+  # Add continent
+  left_join(cntry_key, by="iso3") %>%
   # Arrange
-  select(iso3, country, nutrient, units_short, sex, age_range, sex, year, supply_cntry_med, scalar, supply_agesex_med, everything()) %>%
-  arrange(iso3, nutrient, sex, age_range, year)
+  select(continent, iso3, country,
+         nutrient, units_short, sex, age_range, sex,
+         year, supply_cntry_med, scalar, supply_agesex_med, everything()) %>%
+  arrange(continent, iso3, nutrient, sex, age_range, year) %>%
+  # Reduce
+  filter(!is.na(supply_agesex_med))
 
 # Inspect
 range(data$year)

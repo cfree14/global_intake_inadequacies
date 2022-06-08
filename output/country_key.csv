@@ -1,0 +1,176 @@
+"continent","country","iso3","hdi","hdi_catg","npeople","genus_yn"
+"Africa","Algeria","DZA",0.748,"High",36661438,TRUE
+"Africa","Angola","AGO",0.581,"Medium",24220660,TRUE
+"Africa","Benin","BEN",0.545,"Low",9460829,TRUE
+"Africa","Botswana","BWA",0.735,"High",2015406,TRUE
+"Africa","Burkina Faso","BFA",0.452,"Low",16081915,TRUE
+"Africa","Cameroon","CMR",0.563,"Medium",20906392,TRUE
+"Africa","Cape Verde","CPV",0.665,"Medium",498858,TRUE
+"Africa","Central African Republic","CAF",0.397,"Low",4418639,TRUE
+"Africa","Chad","TCD",0.398,"Low",12360986,FALSE
+"Africa","Congo - Brazzaville","COG",0.574,"Medium",4394842,TRUE
+"Africa","Côte d’Ivoire","CIV",0.538,"Low",21028652,TRUE
+"Africa","Djibouti","DJI",0.524,"Low",853671,TRUE
+"Africa","Egypt","EGY",0.707,"High",84529251,TRUE
+"Africa","Ethiopia","ETH",0.485,"Low",90139928,TRUE
+"Africa","Gabon","GAB",0.703,"High",1684629,FALSE
+"Africa","Gambia","GMB",0.496,"Low",1848142,TRUE
+"Africa","Ghana","GHA",0.611,"Medium",25387713,TRUE
+"Africa","Guinea","GIN",0.477,"Low",10420459,TRUE
+"Africa","Guinea-Bissau","GNB",0.48,"Low",1562996,TRUE
+"Africa","Kenya","KEN",0.601,"Medium",43178270,TRUE
+"Africa","Lesotho","LSO",0.527,"Low",2003793,FALSE
+"Africa","Liberia","LBR",0.48,"Low",4017446,FALSE
+"Africa","Libya","LBY",0.724,"High",6247438,TRUE
+"Africa","Madagascar","MDG",0.528,"Low",21743970,TRUE
+"Africa","Malawi","MWI",0.483,"Low",14962118,TRUE
+"Africa","Mali","MLI",0.434,"Low",15514593,TRUE
+"Africa","Mauritania","MRT",0.546,"Low",3598646,TRUE
+"Africa","Mauritius","MUS",0.804,"Very high",1252405,TRUE
+"Africa","Morocco","MAR",0.686,"Medium",32781860,TRUE
+"Africa","Mozambique","MOZ",0.456,"Low",24187500,TRUE
+"Africa","Namibia","NAM",0.646,"Medium",2156698,TRUE
+"Africa","Niger","NER",0.394,"Low",17114770,TRUE
+"Africa","Nigeria","NGA",0.539,"Low",162805080,TRUE
+"Africa","Rwanda","RWA",0.543,"Low",10293333,TRUE
+"Africa","São Tomé & Príncipe","STP",0.625,"Medium",184521,FALSE
+"Africa","Senegal","SEN",0.512,"Low",13033814,TRUE
+"Africa","Sierra Leone","SLE",0.452,"Low",6563238,FALSE
+"Africa","Somalia","SOM",NA,"Low",12376305,FALSE
+"Africa","South Africa","ZAF",0.709,"High",52003759,TRUE
+"Africa","Sudan","SDN",0.51,"Low",35349676,TRUE
+"Africa","Swaziland","SWZ",0.611,"Medium",1072029,TRUE
+"Africa","Tanzania","TZA",0.529,"Low",45673520,TRUE
+"Africa","Togo","TGO",0.515,"Low",6595939,FALSE
+"Africa","Tunisia","TUN",0.74,"High",10741872,TRUE
+"Africa","Uganda","UGA",0.544,"Low",33476772,FALSE
+"Africa","Zambia","ZMB",0.584,"Medium",14023199,FALSE
+"Africa","Zimbabwe","ZWE",0.571,"Medium",12894323,TRUE
+"Americas","Antigua & Barbuda","ATG",0.778,"High",89250,TRUE
+"Americas","Argentina","ARG",0.845,"Very high",41261485,TRUE
+"Americas","Bahamas","BHS",0.814,"Very high",359583,TRUE
+"Americas","Barbados","BRB",0.814,"Very high",282987,TRUE
+"Americas","Belize","BLZ",0.716,"High",330236,TRUE
+"Americas","Bermuda","BMU",NA,"High",NA,FALSE
+"Americas","Bolivia","BOL",0.718,"High",10212951,TRUE
+"Americas","Brazil","BRA",0.765,"High",197514541,TRUE
+"Americas","Canada","CAN",0.929,"Very high",34339329,TRUE
+"Americas","Chile","CHL",0.851,"Very high",17233584,TRUE
+"Americas","Colombia","COL",0.767,"High",45662747,TRUE
+"Americas","Costa Rica","CRI",0.81,"Very high",4633086,TRUE
+"Americas","Cuba","CUB",0.783,"High",11236671,TRUE
+"Americas","Dominica","DMA",0.742,"High",NA,FALSE
+"Americas","Dominican Republic","DOM",0.756,"High",9813219,TRUE
+"Americas","Ecuador","ECU",0.759,"High",15243885,TRUE
+"Americas","El Salvador","SLV",0.673,"Medium",6210567,TRUE
+"Americas","Grenada","GRD",0.779,"High",106786,TRUE
+"Americas","Guatemala","GTM",0.663,"Medium",14521516,TRUE
+"Americas","Guyana","GUY",0.682,"Medium",752029,TRUE
+"Americas","Haiti","HTI",0.51,"Low",10100320,TRUE
+"Americas","Honduras","HND",0.634,"Medium",8480670,TRUE
+"Americas","Jamaica","JAM",0.734,"High",2825932,TRUE
+"Americas","Mexico","MEX",0.779,"High",115695468,TRUE
+"Americas","Netherlands Antilles","NDA",NA,"High",NA,FALSE
+"Americas","Nicaragua","NIC",0.66,"Medium",5903035,TRUE
+"Americas","Panama","PAN",0.815,"Very high",3706479,TRUE
+"Americas","Paraguay","PRY",0.728,"High",6333981,TRUE
+"Americas","Peru","PER",0.777,"High",29264314,TRUE
+"Americas","St. Kitts & Nevis","KNA",0.779,"High",NA,FALSE
+"Americas","St. Lucia","LCA",0.759,"High",175538,TRUE
+"Americas","St. Vincent & Grenadines","VCT",0.738,"High",108315,TRUE
+"Americas","Suriname","SUR",0.738,"High",535177,TRUE
+"Americas","Trinidad & Tobago","TTO",0.796,"High",1336180,TRUE
+"Americas","United States","USA",0.926,"Very high",311583481,TRUE
+"Americas","Uruguay","URY",0.817,"Very high",3368926,TRUE
+"Americas","Venezuela","VEN",0.711,"High",28887873,TRUE
+"Asia","Afghanistan","AFG",0.511,"Low",30117411,FALSE
+"Asia","Armenia","ARM",0.776,"High",2876536,TRUE
+"Asia","Azerbaijan","AZE",0.756,"High",9173082,TRUE
+"Asia","Bangladesh","BGD",0.632,"Medium",149273134,TRUE
+"Asia","Brunei","BRN",0.838,"Very high",393687,TRUE
+"Asia","Cambodia","KHM",0.594,"Medium",14541421,FALSE
+"Asia","China","CHN",0.761,"High",1345035000,TRUE
+"Asia","Cyprus","CYP",0.887,"Very high",1124837,TRUE
+"Asia","Georgia","GEO",0.812,"Very high",3756443,TRUE
+"Asia","India","IND",0.645,"Medium",1250287939,TRUE
+"Asia","Indonesia","IDN",0.718,"High",245115988,TRUE
+"Asia","Iran","IRN",0.783,"High",74634959,TRUE
+"Asia","Iraq","IRQ",0.674,"Medium",30725305,TRUE
+"Asia","Israel","ISR",0.919,"Very high",7765802,TRUE
+"Asia","Japan","JPN",0.919,"Very high",127833003,TRUE
+"Asia","Jordan","JOR",0.729,"High",7662858,TRUE
+"Asia","Kazakhstan","KAZ",0.825,"Very high",16557203,TRUE
+"Asia","Kuwait","KWT",0.806,"Very high",3168054,TRUE
+"Asia","Kyrgyzstan","KGZ",0.697,"Medium",5514601,TRUE
+"Asia","Laos","LAO",0.613,"Medium",6347564,TRUE
+"Asia","Lebanon","LBN",0.744,"High",5202022,TRUE
+"Asia","Malaysia","MYS",0.81,"Very high",28650962,TRUE
+"Asia","Maldives","MDV",0.74,"High",380493,TRUE
+"Asia","Mongolia","MNG",0.737,"High",2770357,TRUE
+"Asia","Myanmar (Burma)","MMR",0.583,"Medium",50990612,FALSE
+"Asia","Nepal","NPL",0.602,"Medium",27041220,TRUE
+"Asia","North Korea","PRK",NA,"Low",24673392,FALSE
+"Asia","Pakistan","PAK",0.557,"Medium",183340168,TRUE
+"Asia","Palestinian Territories","PSE",0.708,"High",3882985,TRUE
+"Asia","Philippines","PHL",0.718,"High",95570049,TRUE
+"Asia","Saudi Arabia","SAU",0.854,"Very high",28267591,TRUE
+"Asia","South Korea","KOR",0.916,"Very high",49936637,TRUE
+"Asia","Sri Lanka","LKA",0.782,"High",20398496,TRUE
+"Asia","Syria","SYR",0.567,"Medium",21081814,TRUE
+"Asia","Tajikistan","TJK",0.668,"Medium",7697507,TRUE
+"Asia","Thailand","THA",0.777,"High",67518379,TRUE
+"Asia","Timor-Leste","TLS",0.606,"Medium",1113154,FALSE
+"Asia","Turkey","TUR",0.82,"Very high",73443254,TRUE
+"Asia","Turkmenistan","TKM",0.715,"High",5174076,FALSE
+"Asia","United Arab Emirates","ARE",0.89,"Very high",8946778,TRUE
+"Asia","Uzbekistan","UZB",0.72,"High",29339399,TRUE
+"Asia","Vietnam","VNM",0.704,"High",88871384,FALSE
+"Asia","Yemen","YEM",0.47,"Low",23807586,TRUE
+"Europe","Albania","ALB",0.795,"High",2905193,TRUE
+"Europe","Austria","AUT",0.922,"Very high",8391645,TRUE
+"Europe","Belarus","BLR",0.823,"Very high",9461641,TRUE
+"Europe","Belgium","BEL",0.931,"Very high",11038265,TRUE
+"Europe","Bosnia & Herzegovina","BIH",0.78,"High",3661173,TRUE
+"Europe","Bulgaria","BGR",0.816,"Very high",7348331,TRUE
+"Europe","Croatia","HRV",0.851,"Very high",4280621,TRUE
+"Europe","Czechia","CZE",0.9,"Very high",10496089,TRUE
+"Europe","Denmark","DNK",0.94,"Very high",5570572,TRUE
+"Europe","Estonia","EST",0.892,"Very high",1327437,TRUE
+"Europe","Finland","FIN",0.938,"Very high",5388274,TRUE
+"Europe","France","FRA",0.901,"Very high",65342789,TRUE
+"Europe","Germany","DEU",0.947,"Very high",80274981,TRUE
+"Europe","Greece","GRC",0.888,"Very high",11104897,TRUE
+"Europe","Hungary","HUN",0.854,"Very high",9971725,TRUE
+"Europe","Iceland","ISL",0.949,"Very high",319014,TRUE
+"Europe","Ireland","IRL",0.955,"Very high",4580085,TRUE
+"Europe","Italy","ITA",0.892,"Very high",59379451,TRUE
+"Europe","Latvia","LVA",0.866,"Very high",2059713,TRUE
+"Europe","Lithuania","LTU",0.882,"Very high",3028113,TRUE
+"Europe","Luxembourg","LUX",0.916,"Very high",518348,TRUE
+"Europe","Macedonia","MKD",0.774,"High",2058539,TRUE
+"Europe","Malta","MLT",0.895,"Very high",416266,TRUE
+"Europe","Moldova","MDA",0.75,"High",2859835,TRUE
+"Europe","Montenegro","MNE",0.829,"Very high",620080,TRUE
+"Europe","Netherlands","NLD",0.944,"Very high",16693073,TRUE
+"Europe","Norway","NOR",0.957,"Very high",4953089,TRUE
+"Europe","Poland","POL",0.88,"Very high",38063256,TRUE
+"Europe","Portugal","PRT",0.864,"Very high",10557561,TRUE
+"Europe","Romania","ROU",0.828,"Very high",20147528,TRUE
+"Europe","Russia","RUS",0.824,"Very high",142960908,TRUE
+"Europe","Serbia","SRB",0.806,"Very high",7234099,TRUE
+"Europe","Slovakia","SVK",0.86,"Very high",5398383,TRUE
+"Europe","Slovenia","SVN",0.917,"Very high",2052843,TRUE
+"Europe","Spain","ESP",0.904,"Very high",46742698,TRUE
+"Europe","Sweden","SWE",0.945,"Very high",9449216,TRUE
+"Europe","Switzerland","CHE",0.955,"Very high",7912399,TRUE
+"Europe","Ukraine","UKR",0.779,"High",45706082,TRUE
+"Europe","United Kingdom","GBR",0.932,"Very high",63258810,TRUE
+"Oceania","Australia","AUS",0.944,"Very high",22340022,TRUE
+"Oceania","Fiji","FJI",0.743,"High",863451,TRUE
+"Oceania","French Polynesia","PYF",NA,"Medium",267702,TRUE
+"Oceania","Kiribati","KIR",0.63,"Medium",104735,FALSE
+"Oceania","New Caledonia","NCL",NA,"Medium",254350,TRUE
+"Oceania","New Zealand","NZL",0.931,"Very high",4383996,TRUE
+"Oceania","Samoa","WSM",0.715,"High",187469,FALSE
+"Oceania","Solomon Islands","SLB",0.567,"Medium",541522,FALSE
+"Oceania","Vanuatu","VUT",0.609,"Medium",242658,FALSE
