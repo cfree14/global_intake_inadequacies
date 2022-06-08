@@ -73,7 +73,11 @@ genus_child_m <- genus_child %>%
   mutate(sex="Males")
 genus_child_f <- genus_child %>%
   mutate(sex="Females")
-genus <- bind_rows(genus_mf, genus_child_m, genus_child_f) %>%
+genus1 <- bind_rows(genus_mf, genus_child_m, genus_child_f) %>%
+  # Add GENUS data type
+  mutate(genus_type="Reported") %>%
+  # Arrange
+  select(continent, iso3, country, genus_type, everything()) %>%
   arrange(continent, iso3, nutrient, sex, age_range, year)
 
 
@@ -81,12 +85,60 @@ genus <- bind_rows(genus_mf, genus_child_m, genus_child_f) %>%
 ################################################################################
 
 # Which countries have population data but not GENuS data?
-isos_genus <- sort(unique(genus$iso3))
+isos_genus <- sort(unique(genus1$iso3))
 isos2match <- pop_orig %>%
   select(iso3, country) %>%
   unique() %>%
   filter(!iso3 %in% isos_genus)
 write.csv(isos2match, file=file.path(tabledir, "TableSX_countries_without_genus_data.csv"), row.names=F)
+
+# Read GENUS country match key
+genus_match_key <- readxl::read_excel(file.path(tabledir, "TableSX_countries_without_genus_data.xlsx"), skip=1) %>%
+  # Rename
+  setNames(c("iso1", "country1", "iso2", "country2"))
+
+# Loop through key and create data to add
+x <- 1
+genus_add <- purrr::map_df(1:nrow(genus_match_key), function(x){
+
+  # ISOs
+  iso_do <- genus_match_key$iso1[x]
+  cntry_do <- genus_match_key$country1[x]
+  # continent_do <- countrycode::countrycode(cntry_do, "country.name", "continent")
+  iso_borrow <- genus_match_key$iso2[x]
+
+  # Get data update data
+  genus_out <- genus1 %>%
+    # Borrowed data
+    filter(iso3==iso_borrow) %>%
+    # Overwrite borrowed country
+    mutate(iso3=iso_do,
+           country=cntry_do) %>%
+    # Add GENUS data type
+    mutate(genus_type="Borrowed")
+
+})
+
+# Merge data
+genus <- bind_rows(genus1, genus_add) %>%
+  # Add country used for GENuS data
+  left_join(genus_match_key %>% select(iso1, iso2, country2), by=c("iso3"="iso1")) %>%
+  rename(genus_iso3=iso2, genus_country=country2) %>%
+  mutate(genus_iso3=ifelse(genus_type=="Reported", iso3, genus_iso3),
+         genus_country=ifelse(genus_type=="Reported", country, genus_country)) %>%
+  # Arrange
+  select(continent:genus_type, genus_iso3, genus_country, everything()) %>%
+  arrange(continent, iso3, nutrient, sex, age_range, year)
+
+# Check ISOs again
+isos_genus <- sort(unique(genus$iso3))
+isos2match <- pop_orig %>%
+  select(iso3, country) %>%
+  unique() %>%
+  filter(!iso3 %in% isos_genus)
+
+# Inspect
+freeR::complete(genus)
 
 
 # Format ARs
@@ -132,13 +184,13 @@ data <- genus %>%
   left_join(pop %>% select(-country), by=c("iso3", "year", "sex", "age_range")) %>%
   # Add HDI
   left_join(hdi_orig %>% select(-country), by="iso3") %>%
+  # Fill in HDI gaps (add HDI of country providing GENUS data)
+  left_join(hdi_orig %>% select(iso3, hdi_catg) %>% rename(hdi_catg2=hdi_catg), by=c("genus_iso3"="iso3")) %>%
+  mutate(hdi_catg=ifelse(!is.na(hdi_catg), hdi_catg, hdi_catg2)) %>%
+  select(-hdi_catg2) %>%
   # Assign an HDI to countries missing an HDI category
-  mutate(hdi_catg=case_when(iso3=="BMU" ~ "High",
-                            iso3=="NDA" ~ "High",
-                            iso3=="NCL" ~ "Medium",
-                            iso3=="PYF" ~ "Medium",
-                            iso3=="SOM" ~ "Low",
-                            iso3=="PRK" ~ "Low",
+  mutate(hdi_catg=case_when(country=="French Polynesia" ~ "Medium",
+                            country=="New Caledonia" ~ "Medium",
                             T ~ hdi_catg)) %>%
   # Add ARs
   # Recode nutrient for matching to ARs
@@ -179,6 +231,9 @@ data <- genus %>%
   # Refactor age range
   mutate(age_range=factor(age_range, levels=levels(genus$age_range)))
 
+# Inspect
+freeR::complete(data)
+
 
 # Build country key
 ################################################################################
@@ -190,9 +245,10 @@ cntry_key <- data %>%
   # Summarize
   group_by(continent, country, iso3, hdi, hdi_catg) %>%
   summarize(npeople=sum(npeople),
-            genus_yn=sum(!is.na(supply_agesex_med)) >0 ) %>%
+            genus_yn=unique(genus_type)) %>%
   ungroup()
 
+# Check number of people
 sum(cntry_key$npeople, na.rm=T) / 1e9
 sum(pop$npeople, na.rm=T) / 1e9 - sum(cntry_key$npeople, na.rm=T) / 1e9
 
@@ -240,7 +296,7 @@ unit_key_check <- unit_key %>%
 ################################################################################
 
 # Export data
-saveRDS(data, file=file.path(outdir, "1961_2011_subnational_nutrient_intake_estimates.Rds"))
+saveRDS(data, file=file.path(outdir, "2011_subnational_nutrient_intake_estimates.Rds"))
 
 
 

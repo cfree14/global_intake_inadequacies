@@ -15,7 +15,7 @@ outdir <- "output"
 plotdir <- "figures"
 
 # Read data
-data_orig <- readRDS(file=file.path(outdir, "1961_2011_subnational_nutrient_intake_estimates.Rds"))
+data_orig <- readRDS(file=file.path(outdir, "2011_subnational_nutrient_intake_estimates.Rds"))
 
 # Get distributions
 dists_orig <- nutriR::dists_full
@@ -48,15 +48,14 @@ dists <- dists_orig %>%
 
 # Format data
 data <- data_orig %>%
-  # Filter to most recent year
-  filter(year==2011) %>%
   # Rename nutrients to match nutriR
   mutate(nutrient=recode(nutrient, "Thiamin"="Thiamine", "Vitamin A"="Vitamin A (RAE)"),
          nutrient_ar=recode(nutrient_ar, "Thiamin"="Thiamine", "Vitamin A"="Vitamin A (RAE)")) %>%
   # Reduce to nutrients in nutriR
   filter(nutrient %in% nutrients_dist) %>%
   # Add distribution code
-  mutate(dist_id=paste(nutrient, iso3, sex, age_range, sep="-")) %>%
+  mutate(dist_id=paste(nutrient, iso3, sex, age_range, sep="-"),
+         dist_id_genus=paste(nutrient, genus_iso3, sex, age_range, sep="-")) %>%
   # Mark whether shape is known or must be imputed
   mutate(shape_status=ifelse(dist_id %in% dists$dist_id, "Known", "Imputed"),
          shape_source=shape_status)
@@ -66,10 +65,10 @@ data <- data_orig %>%
 ################################################################################
 
 # Impute order
-# Known
-# Nearest age within sex
-# From other sex within country
-# From nearest country
+# (1) Known
+# (2) Nearest age within sex
+# (3) From other sex within country
+# (4) From nearest country
 
 # Mark imputation tpye
 data1 <- data %>%
@@ -141,7 +140,6 @@ find_closest_age_group_w_data <- function(df, dist_id){
 
 # First imputation: closest age group
 data2 <- data1 %>%
-  filter(nutrient=="Calcium") %>%
   rowwise() %>%
   mutate(dist_id_shape=ifelse(shape_source=="From closest age group", find_closest_age_group_w_data(., dist_id), dist_id_shape)) %>%
   ungroup()
@@ -175,6 +173,7 @@ data3 <- data2 %>%
   rowwise() %>%
   mutate(dist_id_shape=ifelse(shape_source=="From opposite sex", find_id_of_opposite_sex(., dist_id), dist_id_shape)) %>%
   ungroup()
+
 
 # 3. From nearest country
 #######################################
@@ -217,7 +216,8 @@ find_id_of_nearest_cntry <- function(df, dist_id){
 # Third imputation: from opposite sex
 data4 <- data3 %>%
   rowwise() %>%
-  mutate(dist_id_shape=ifelse(shape_source=="From most similar country", find_id_of_nearest_cntry(., dist_id), dist_id_shape)) %>%
+  mutate(dist_id_shape=ifelse(shape_source=="From most similar country",
+                              find_id_of_nearest_cntry(., dist_id_genus), dist_id_shape)) %>%
   ungroup()
 
 
@@ -228,6 +228,8 @@ data4 <- data3 %>%
 data5 <- data4 %>%
   # Add distribution info
   left_join(dists, by=c("dist_id_shape"="dist_id"))
+
+freeR::complete(data5)
 
 # Do gammas
 data5_gamma <- data5 %>%
@@ -240,7 +242,7 @@ data5_gamma <- data5 %>%
   ungroup() %>%
   # Calculate intake inadequacy
   rowwise() %>%
-  mutate(sev=nutriR::sev(ear = ar, cv = 0.10, shape=g_shape_shift, rate=g_rate_shift, plot=F)) %>%
+  mutate(sev=nutriR::sev(ear = ar, cv = ar_cv, shape=g_shape_shift, rate=g_rate_shift, plot=F)) %>%
   ungroup() %>%
   # Calculate number of people with inadeuate intakes
   mutate(ndeficient=npeople*sev/100)
@@ -256,7 +258,7 @@ data5_lognormal <- data5 %>%
   ungroup() %>%
   # Calculate intake inadequacy
   rowwise() %>%
-  mutate(sev=nutriR::sev(ear = ar, cv = 0.10, meanlog=ln_meanlog_shift, sdlog=ln_sdlog_shift, plot=F)) %>%
+  mutate(sev=nutriR::sev(ear = ar, cv = ar_cv, meanlog=ln_meanlog_shift, sdlog=ln_sdlog_shift, plot=F)) %>%
   ungroup() %>%
   # Calculate number of people with inadeuate intakes
   mutate(ndeficient=npeople*sev/100)
@@ -268,7 +270,7 @@ data6 <- bind_rows(data5_gamma, data5_lognormal) %>%
 
 
 # Export data
-saveRDS(data6, "2011_subnational_nutrient_intake_inadequacy_estimates_full.Rds")
+saveRDS(data6, file.path(outdir, "2011_subnational_nutrient_intake_inadequacy_estimates_full.Rds"))
 
 
 # Simplify
@@ -283,7 +285,7 @@ data6_simple <- data6 %>%
   rename(units=units_short, intake=supply_agesex_med)
 
 # Export simplified data
-saveRDS(data6_simple, "2011_subnational_nutrient_intake_inadequacy_estimates_simple.Rds")
+saveRDS(data6_simple, file.path(outdir, "2011_subnational_nutrient_intake_inadequacy_estimates_simple.Rds"))
 
 
 

@@ -31,29 +31,32 @@ world_tiny_orig <- rnaturalearth::ne_countries(type="tiny_countries", returnclas
 
 # Format world (small) - for plotting
 world_sm <- world_sm_orig %>%
-  select(brk_a3) %>%
-  rename(iso3=brk_a3) %>%
+  select(geounit, gu_a3) %>%
+  mutate(iso3=countrycode::countrycode(geounit, "country.name", "iso3c"),
+         iso3=ifelse(!is.na(iso3), iso3, gu_a3)) %>%
   # Add metadata
   left_join(data, by="iso3") %>%
   mutate(genus_yn=ifelse(is.na(genus_yn), F, genus_yn)) %>%
-  # Formay HDI catg
-  mutate(hdi_catg=factor(hdi_catg, levels=c("Low", "Medium", "High", "Very high")))
+  # Format HDI catg
+  mutate(genus_yn=ifelse(genus_yn==F, NA, genus_yn),
+         hdi_catg=factor(hdi_catg, levels=c("Low", "Medium", "High", "Very high")))
 
 # Format world (large) - for centroids
 world_lg <- world_lg_orig %>%
-  select(brk_a3) %>%
-  rename(iso3=brk_a3) %>%
+  select(gu_a3) %>%
+  rename(iso3=gu_a3) %>%
   # Calculate area
   mutate(area_sqkm=sf::st_area(.) %>% as.numeric() %>% measurements::conv_unit(., from="m2", to="km2"))
 
 # Format tiny countries - for plotting and centroids
 world_tiny <- world_tiny_orig  %>%
-  select(brk_a3) %>%
-  rename(iso3=brk_a3) %>%
+  select(gu_a3) %>%
+  rename(iso3=gu_a3) %>%
   # Add metadata
   left_join(data, by="iso3") %>%
   # Formay HDI catg
-  mutate(hdi_catg=factor(hdi_catg, levels=c("Low", "Medium", "High", "Very high"))) %>%
+  mutate(genus_yn=ifelse(genus_yn==F, NA, genus_yn),
+         hdi_catg=factor(hdi_catg, levels=c("Low", "Medium", "High", "Very high"))) %>%
   # Add lat/long
   mutate(long_dd = sf::st_coordinates(.)[,1],
          lat_dd = sf::st_coordinates(.)[,2])
@@ -61,7 +64,7 @@ world_tiny <- world_tiny_orig  %>%
 # Centroids - large
 world_lg_centroids <- world_lg %>%
   sf::st_make_valid() %>%
-  sf::st_centroid() %>%
+  sf::st_centroid(of_largest_polygon = T) %>%
   # Add lat/long
   mutate(long_dd = sf::st_coordinates(.)[,1],
          lat_dd = sf::st_coordinates(.)[,2]) %>%
@@ -100,7 +103,7 @@ genus_match_key <- readxl::read_excel(file.path(tabledir, "TableSX_countries_wit
 ################################################################################
 
 # Theme
-my_theme <-  theme(axis.text=element_text(size=6),
+my_theme <-  theme(axis.text=element_blank(),
                    axis.title=element_blank(),
                    legend.text=element_text(size=6),
                    legend.title=element_text(size=8),
@@ -115,13 +118,16 @@ my_theme <-  theme(axis.text=element_text(size=6),
                    legend.background = element_rect(fill=alpha('blue', 0)))
 
 # Plot GENuS coverage
-g <- ggplot(world_sm , aes(fill=genus_yn)) +
+g <- ggplot(world_sm, aes(fill=genus_yn)) +
   geom_sf(lwd=0.1, color="grey30") +
-  geom_sf(data=world_tiny, color="grey30", size=1.5, pch=21) +
+  # geom_sf(data=world_tiny, color="grey30", size=1.5, pch=21) +
   # Plot links
   geom_segment(data=genus_match_key, mapping=aes(x=long1, xend=long2, y=lat1, yend=lat2), inherit.aes = F, lwd=0.4) +
+  # Plot nodes
+  geom_point(data=genus_match_key, mapping=aes(x=long1, y=lat1), color="darkred", inherit.aes = F, size=0.25) +
+  geom_point(data=genus_match_key, mapping=aes(x=long2, y=lat2), color="black", inherit.aes = F, size=0.25) +
   # Legend
-  scale_fill_manual(name="GENuS data?", values=c("red", "grey90")) +
+  scale_fill_manual(name="GENuS data", values=c("red", "grey90"), na.value = "grey30") +
   # Crop
   coord_sf(ylim=c(-52, 80)) +
   # Theme
@@ -130,14 +136,14 @@ g
 
 # Export
 ggsave(g, filename=file.path(plotdir, "FigSX_genus_data.png"),
-       width=6.5, height=2.75, units="in", dpi=600)
+       width=6.5, height=2.25, units="in", dpi=600)
 
 
 # Plot data
 ################################################################################
 
 # Theme
-my_theme <-  theme(axis.text=element_text(size=6),
+my_theme <-  theme(axis.text=element_blank(),
                    axis.title=element_text(size=8),
                    legend.text=element_text(size=6),
                    legend.title=element_text(size=8),
@@ -153,12 +159,12 @@ my_theme <-  theme(axis.text=element_text(size=6),
 
 
 # Plot population
-g1 <- ggplot(world, aes(fill=npeople)) +
+g1 <- ggplot(world_sm, aes(fill=npeople/1e6)) +
   geom_sf(lwd=0.2, color="grey30") +
   geom_sf(data=world_tiny, color="grey30", size=1.5, pch=21) +
   # Legend
-  scale_fill_gradientn(name="Population", colors=RColorBrewer::brewer.pal(9, "YlOrRd"),
-                       trans="log10") +
+  scale_fill_gradientn(name="Population\n(millions of people)", colors=RColorBrewer::brewer.pal(9, "YlOrRd"),
+                       trans="log10", na.value="grey80") +
   guides(fill = guide_colorbar(ticks.colour = "black", frame.colour = "black")) +
   # Crop
   coord_sf(ylim=c(-52, 80)) +
@@ -167,11 +173,11 @@ g1 <- ggplot(world, aes(fill=npeople)) +
 g1
 
 # Plot HDI index
-g2 <- ggplot(world, aes(fill=hdi)) +
+g2 <- ggplot(world_sm, aes(fill=hdi)) +
   geom_sf(lwd=0.2, color="grey30") +
   geom_sf(data=world_tiny, color="grey30", size=1.5, pch=21) +
   # Legend
-  scale_fill_gradientn(name="HDI index", colors=RColorBrewer::brewer.pal(9, "Spectral")) +
+  scale_fill_gradientn(name="HDI index              ", colors=RColorBrewer::brewer.pal(9, "Spectral"), na.value="grey80") +
   guides(fill = guide_colorbar(ticks.colour = "black", frame.colour = "black")) +
   # Crop
   coord_sf(ylim=c(-52, 80)) +
@@ -180,11 +186,11 @@ g2 <- ggplot(world, aes(fill=hdi)) +
 g2
 
 # Plot HDI category
-g3 <- ggplot(world, aes(fill=hdi_catg)) +
+g3 <- ggplot(world_sm, aes(fill=hdi_catg)) +
   geom_sf(lwd=0.2, color="grey30") +
   geom_sf(data=world_tiny, color="grey30", size=1.5, pch=21, show.legend = F) +
   # Legend
-  scale_fill_ordinal(name="HDI category") +
+  scale_fill_ordinal(name="HDI category          ", na.value="grey80") +
   # Crop
   coord_sf(ylim=c(-52, 80)) +
   # Theme
@@ -196,7 +202,7 @@ g <- gridExtra::grid.arrange(g1, g2, g3, ncol=1)
 
 # Export
 ggsave(g, filename=file.path(plotdir, "FigSX_population_and_hdi.png"),
-       width=6.5, height=7, units="in", dpi=600)
+       width=6.5, height=6.5, units="in", dpi=600)
 
 
 
