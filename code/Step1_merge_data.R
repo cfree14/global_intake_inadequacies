@@ -62,6 +62,7 @@ pop <- pop_orig %>%
   rename(age_range=age) %>%
   filter(year==2011)
 sum(pop$npeople, na.rm=T) / 1e9
+n_distinct(pop$iso3)
 
 # Format GENUS data
 # (1) Separate children and non-children data; (2) duplicate children into males/females; (3) merge and sort
@@ -144,6 +145,10 @@ freeR::complete(genus)
 # Format ARs
 ################################################################################
 
+# Nutrient names
+sort(unique(ars_orig$nutrient))
+sort(unique(genus$nutrient))
+
 # Format ARs
 ars <- ars_orig %>%
   # Reduce to ARs and eliminate stafes
@@ -152,6 +157,10 @@ ars <- ars_orig %>%
   select(nutrient, units, source, sex, age_group, nrv, nrv_note) %>%
   # Rename
   rename(age_range=age_group, ar=nrv, ar_note=nrv_note) %>%
+  # Format a few nutrients
+  mutate(nutrient=recode(nutrient,
+                         "Vitamin B-6"="Vitamin B6",
+                         "Vitamin B-12"="Vitamin B12")) %>%
   # Convert copper from micrograms to milligrams
   mutate(ar=ifelse(nutrient=="Copper", measurements::conv_unit(ar, from="ug", to="mg"), ar),
          units=case_when(nutrient=="Copper" ~ "mg",

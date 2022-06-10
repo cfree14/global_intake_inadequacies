@@ -82,7 +82,7 @@ world_tiny_centroids <- world_tiny %>%
 # Centroids all
 world_centroids <- bind_rows(world_lg_centroids, world_tiny_centroids %>% filter(!iso3 %in% world_lg_centroids$iso3))
 freeR::which_duplicated(world_centroids$iso3)
-freeR::which_duplicated(world_centroids$country)
+freeR::which_duplicated(world_centroids$iso3)
 
 
 # Export data

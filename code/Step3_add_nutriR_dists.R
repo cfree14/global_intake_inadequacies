@@ -26,8 +26,7 @@ diss_matrix <- readRDS(file=file.path(outdir, "GENUS_country_dissimilarity.Rds")
 
 # To-do list
 # 1) Function to shift distribution to match medians (I think current is for means)
-# 2) Figure out procedure for adding reference dist id
-# 3) Have figure show where the shape parameters were imputed from
+
 
 # Merge
 ################################################################################
@@ -37,6 +36,9 @@ nutrients_genus <- sort(unique(data_orig$nutrient))
 nutrients_dist <- sort(unique(dists_orig$nutrient))
 nutrients_genus[!nutrients_genus %in% nutrients_dist]
 
+# Nutrients w/out ARs
+nutrients_without_ar <- c("Protein", "Carbohydrates", "Fat", "Monounsaturated fatty acids", "Polyunsaturated fatty acids", "Potassium", "Sodium")
+
 # Format dists
 dists <- dists_orig %>%
   # Rename
@@ -44,7 +46,7 @@ dists <- dists_orig %>%
   # Add distribution code
   mutate(dist_id=paste(nutrient, iso3, sex, age_range, sep="-")) %>%
   # Simplify
-  select(dist_id, best_dist, g_shape, g_rate, g_mu, ln_meanlog, ln_sdlog, ln_mu)
+  select(nutrient, iso3, sex, age_range, dist_id, best_dist, g_shape, g_rate, g_mu, ln_meanlog, ln_sdlog, ln_mu)
 
 # Format data
 data <- data_orig %>%
@@ -58,7 +60,57 @@ data <- data_orig %>%
          dist_id_genus=paste(nutrient, genus_iso3, sex, age_range, sep="-")) %>%
   # Mark whether shape is known or must be imputed
   mutate(shape_status=ifelse(dist_id %in% dists$dist_id, "Known", "Imputed"),
-         shape_source=shape_status)
+         shape_source=shape_status) %>%
+  # Remove protein and other nutrients w/out AR data
+  filter(!nutrient %in% nutrients_without_ar)
+
+# Inspect nutrients
+nutrient_key <- data %>%
+  select(nutrient, units_short, ar_source) %>%
+  unique() %>% arrange(desc(ar_source))
+
+
+# Build country match key
+################################################################################
+
+# Dist key
+dist_key <- dists %>%
+  count(nutrient, iso3)
+
+#
+nutrient <- "Copper"; iso3 <- "KEN"
+find_most_sim_cntry_w_data <- function(nutrient, iso3){
+
+  # Identify countries with data for nutrients
+  nutrient_do <- nutrient
+  isos_w_data <- dist_key %>%
+    filter(nutrient==nutrient_do) %>%
+    pull(iso3)
+
+  # Which one is most similar to this country?
+  most_sim_iso <- diss_matrix %>%
+    filter(iso1==iso3 & iso2 %in%   isos_w_data) %>%
+    arrange(diss) %>% slice(1) %>% pull(iso2) %>% as.character()
+
+  # Return
+  return(most_sim_iso)
+
+}
+
+# Build country match key: 30 seconds to run
+sim_cntry_w_nutriR_key <- expand.grid(nutrient=nutrient_key$nutrient,
+                                      iso3=unique(diss_matrix$iso1)) %>%
+  arrange(nutrient, iso3) %>%
+  # Mark whether it has dist data
+  left_join(dist_key, by=c("nutrient", "iso3")) %>%
+  rename(dist_yn=n) %>%
+  mutate(dist_yn=ifelse(!is.na(dist_yn), "yes", "no")) %>%
+  # Get most similar iso
+  rowwise() %>%
+  mutate(iso3_w_data=ifelse(dist_yn=="yes", iso3, find_most_sim_cntry_w_data(nutrient, iso3))) %>%
+  ungroup()
+
+
 
 
 # Begin to impute
@@ -87,10 +139,15 @@ data1 <- data %>%
   # Order sources
   mutate(shape_source=factor(shape_source, levels=c("Known", "From closest age group", "From opposite sex", "From most similar country"))) %>%
   # Create column indicating the distribution id used to describe shape
-  mutate(dist_id_shape=ifelse(shape_source=="Known", dist_id, NA))
+  mutate(dist_id_shape=ifelse(shape_source=="Known", dist_id, NA)) %>%
+  # Add most similar country with data available
+  left_join(sim_cntry_w_nutriR_key, by=c("genus_iso3"="iso3", "nutrient"))
 
 # Examine imputation types
 table(data1$shape_source)
+
+# Examine: only npeople, HDI, and dist_id_shape should have NAs
+freeR::complete(data1)
 
 
 # 1. Nearest age within sex
@@ -140,6 +197,7 @@ find_closest_age_group_w_data <- function(df, dist_id){
 
 # First imputation: closest age group
 data2 <- data1 %>%
+  # filter(nutrient %in% c("Calcium", "Zinc")) %>%
   rowwise() %>%
   mutate(dist_id_shape=ifelse(shape_source=="From closest age group", find_closest_age_group_w_data(., dist_id), dist_id_shape)) %>%
   ungroup()
@@ -178,48 +236,68 @@ data3 <- data2 %>%
 # 3. From nearest country
 #######################################
 
-df <- data3
-dist_id <- "Calcium-AGO-Females-80+"
-find_id_of_nearest_cntry <- function(df, dist_id){
+# df <- data3
+# dist_id <- "Calcium-AGO-Females-80+"
+# find_id_of_nearest_cntry <- function(df, dist_id){
+#
+#   # Extract info
+#   nutrient_do <- strsplit(dist_id, split="-")[[1]][1]
+#   iso_do <- strsplit(dist_id, split="-")[[1]][2]
+#   sex_do <- strsplit(dist_id, split="-")[[1]][3]
+#   age_do <- paste(strsplit(dist_id, split="-")[[1]][4], strsplit(dist_id, split="-")[[1]][5], sep="-")
+#   if(age_do=="80+-NA"){age_do <- "80+"}
+#
+#   # Identify countries with info for this nutrient
+#   isos_w_data <- dists_orig %>%
+#     filter(nutrient==nutrient_do) %>% pull(iso3) %>% unique()
+#
+#   # Identify most similar country among countries with info
+#   most_similar_iso <- diss_matrix %>%
+#     filter(iso1==iso_do & iso2 %in% isos_w_data) %>%
+#     arrange(diss) %>% slice(1) %>% pull(iso2) %>% as.character()
+#
+#   # Extract distribution id used for sex-age from most similar country
+#   dist_use <- try(df %>%
+#     filter(nutrient==nutrient_do & iso3==most_similar_iso & sex==sex_do & age_range==age_do) %>%
+#     pull(dist_id_shape))
+#
+#   # If none
+#   if(length(dist_use)==0 | inherits(dist_use, "try-error")){
+#     dist_use <- NA
+#   }
+#
+#   # Return
+#   return(dist_use)
+#
+# }
+#
+# # Third imputation: from nearest country
+# data4 <- data3 %>%
+#   rowwise() %>%
+#   mutate(dist_id_shape=ifelse(shape_source=="From most similar country",
+#                               find_id_of_nearest_cntry(., dist_id_genus), dist_id_shape)) %>%
+#   ungroup()
 
-  # Extract info
-  nutrient_do <- strsplit(dist_id, split="-")[[1]][1]
-  iso_do <- strsplit(dist_id, split="-")[[1]][2]
-  sex_do <- strsplit(dist_id, split="-")[[1]][3]
-  age_do <- paste(strsplit(dist_id, split="-")[[1]][4], strsplit(dist_id, split="-")[[1]][5], sep="-")
-  if(age_do=="80+-NA"){age_do <- "80+"}
 
-  # Identify countries with info for this nutrient
-  isos_w_data <- dists_orig %>%
-    filter(nutrient==nutrient_do) %>% pull(iso3) %>% unique()
+# Create key for ones with data
+dist_key2 <- data3 %>%
+  select(dist_id_genus, dist_id_shape) %>%
+  unique() %>%
+  rename(dist_id_shape2=dist_id_shape) %>%
+  filter(!is.na(dist_id_shape2))
 
-  # Identify most similar country among countries with info
-  most_similar_iso <- diss_matrix %>%
-    filter(iso1==iso_do & iso2 %in% isos_w_data) %>%
-    arrange(diss) %>% slice(1) %>% pull(iso2) %>% as.character()
-
-  # Extract distribution id used for sex-age from most similar country
-  dist_use <- try(df %>%
-    filter(nutrient==nutrient_do & iso3==most_similar_iso & sex==sex_do & age_range==age_do) %>%
-    pull(dist_id_shape))
-
-  # If none
-  if(length(dist_use)==0 | inherits(dist_use, "try-error")){
-    dist_use <- NA
-  }
-
-  # Return
-  return(dist_use)
-
-}
-
-# Third imputation: from opposite sex
+# Third imputation: from nearest country
 data4 <- data3 %>%
-  rowwise() %>%
-  mutate(dist_id_shape=ifelse(shape_source=="From most similar country",
-                              find_id_of_nearest_cntry(., dist_id_genus), dist_id_shape)) %>%
-  ungroup()
+  # Add dist id for nearest country with data
+  mutate(dist_id_nutriR=paste(nutrient, iso3_w_data, sex, age_range, sep="-")) %>%
+  # Add dist id source based on this data
+  left_join(dist_key2, by=c("dist_id_nutriR"="dist_id_genus")) %>%
+  mutate(dist_id_shape=ifelse(!is.na(dist_id_shape), dist_id_shape, dist_id_shape2)) %>%
+  select(-dist_id_shape2)
 
+
+# Inspect
+freeR::complete(data4)
 
 # Add distribution info
 ################################################################################
@@ -227,7 +305,7 @@ data4 <- data3 %>%
 # Add dist info
 data5 <- data4 %>%
   # Add distribution info
-  left_join(dists, by=c("dist_id_shape"="dist_id"))
+  left_join(dists %>% select(-c(nutrient, iso3, sex, age_range)), by=c("dist_id_shape"="dist_id"))
 
 freeR::complete(data5)
 
@@ -336,6 +414,7 @@ plot_impute_rate <- function(data_do=data1, nutrient="Calcium"){
   return(g)
 
 }
+
 
 
 

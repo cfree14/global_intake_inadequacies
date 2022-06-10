@@ -30,23 +30,10 @@ world_centers <- readRDS(file=file.path(gisdir, "world_centroids.Rds"))
 # Build data
 data <- data_orig %>%
   group_by(nutrient, continent, iso3, country) %>%
-  summarize(npeople=sum(npeople),
-            ndeficient=sum(ndeficient)) %>%
+  summarize(npeople=sum(npeople, na.rm=T),
+            ndeficient=sum(ndeficient, na.rm=T)) %>%
   mutate(pdeficient=ndeficient/npeople) %>%
   ungroup()
-
-# Add to spatial data
-data_sf <- world_sm %>%
-  select(-country) %>%
-  left_join(data, by="iso3") %>%
-  mutate(nutrient="Calcium") # Won't work with more nutrients
-
-# Create points for small countries
-data_pts <- world_centers %>%
-  select(-country) %>%
-  left_join(data, by="iso3") %>%
-  mutate(nutrient="Calcium") %>% # Won't work with more nutrients
-  filter(area_sqkm<=25000 & !is.na(pdeficient))
 
 # Build labels
 stat_labels <- data %>%
@@ -54,8 +41,41 @@ stat_labels <- data %>%
   summarize(npeople=sum(npeople, na.rm=T),
             ndeficient=sum(ndeficient, na.rm=T)) %>%
   mutate(pdeficient=ndeficient/npeople,
-         label=paste0(round(ndeficient/1e9, 2), " billion people\n", round(pdeficient*100,1), "% of global population")) %>%
-  ungroup()
+         label=paste0(round(ndeficient/1e9, 2), " billion people\n", round(pdeficient*100,1), "% of population")) %>%
+  ungroup() %>%
+  arrange(desc(pdeficient))
+
+# Nutrients
+nutrients <- stat_labels$nutrient
+
+# Add to spatial data
+x <- nutrients[1]
+data_sf <- purrr::map_df(nutrients, function(x){
+  out <- world_sm %>%
+    select(-country) %>%
+    left_join(data %>% filter(nutrient==x), by="iso3") %>%
+    mutate(nutrient=x)
+}) %>% mutate(nutrient=factor(nutrient, levels=nutrients))
+
+
+# Create points for small countries
+data_pts <- purrr::map_df(nutrients, function(x){
+  out <- world_centers %>%
+    select(-country) %>%
+    left_join(data %>% filter(nutrient==x), by="iso3") %>%
+    mutate(nutrient=x) %>%
+    filter(area_sqkm<=25000 & !is.na(pdeficient))
+}) %>% mutate(nutrient=factor(nutrient, levels=nutrients))
+
+# Build labels
+stat_labels <- data %>%
+  group_by(nutrient) %>%
+  summarize(npeople=sum(npeople, na.rm=T),
+            ndeficient=sum(ndeficient, na.rm=T)) %>%
+  mutate(pdeficient=ndeficient/npeople,
+         label=paste0(round(ndeficient/1e9, 2), " billion people\n", round(pdeficient*100,1), "% of population")) %>%
+  ungroup() %>%
+  mutate(nutrient=factor(nutrient, levels=nutrients))
 
 
 # Plot data
@@ -64,27 +84,34 @@ stat_labels <- data %>%
 # Setup theme
 theme1 <- theme(axis.text=element_blank(),
                 axis.title=element_blank(),
-                legend.text=element_text(size=6),
-                legend.title=element_text(size=8),
-                strip.text=element_text(size=8),
-                plot.title=element_text(size=10),
+                legend.text=element_text(size=5),
+                legend.title=element_text(size=6),
+                strip.text=element_text(size=6, hjust=0.5, face="bold"),
+                # Borders/axes
+                strip.background=element_blank(),
+                axis.line.x = element_blank(),
+                axis.line.y = element_blank(),
+                axis.ticks = element_blank(),
+                panel.border = element_blank(),
                 # Gridlines
                 panel.grid.major = element_blank(),
                 panel.grid.minor = element_blank(),
                 panel.background = element_blank(),
                 axis.line = element_line(colour = "black"),
                 # Legend
+                legend.position = "bottom",
+                legend.key.size = unit(0.5, "cm"),
                 legend.background = element_rect(fill=alpha('blue', 0)))
 
 # Plot data
 g <- ggplot() +
   # Facet
-  facet_wrap(~nutrient) +
+  facet_wrap(~nutrient, ncol=3) +
   # Plot data
-  geom_sf(data=data_sf, mapping=aes(fill=pdeficient), lwd=0.2) +
-  geom_point(data=data_pts, mapping=aes(x=long_dd, y=lat_dd, fill=pdeficient), pch=21, size=1.5, inherit.aes = F) +
+  geom_sf(data=data_sf, mapping=aes(fill=pdeficient), lwd=0.1) +
+  geom_point(data=data_pts, mapping=aes(x=long_dd, y=lat_dd, fill=pdeficient), pch=21, size=0.9, inherit.aes = F, stroke=0.2) +
   # Add label
-  geom_text(data=stat_labels, mapping=aes(x=-160, y=-40, label=label), size=2.4, hjust=0, inherit.aes=F) +
+  geom_text(data=stat_labels, mapping=aes(x=-180, y=-42, label=label), size=1.4, hjust=0, nudge_x=-0.5, inherit.aes=F) +
   # Legend
   scale_fill_gradientn(name="% inadequate",
                        labels=scales::percent, lim=c(0,1),
@@ -92,9 +119,14 @@ g <- ggplot() +
                        na.value="grey90") +
   guides(fill = guide_colorbar(ticks.colour = "black", frame.colour = "black")) +
   # Crop
-  coord_sf(ylim=c(-52, 80)) +
+  coord_sf(ylim=c(-52, 78)) +
   # Theme
   theme_bw() + theme1
 g
+
+# Export
+ggsave(g, filename=file.path(plotdir, "Fig1_intake_inadequacy.png"),
+       width=6.5, height=5, units="in", dpi=600)
+
 
 
