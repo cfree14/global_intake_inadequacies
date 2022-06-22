@@ -47,7 +47,6 @@ data_orig <- purrr::map_df(files2merge, function(x){
   fdata_orig <- read.csv(file.path(indir, "Global estimates", x), as.is=T) %>%
     mutate(filename=x)
 
-
 })
 
 # Format data
@@ -93,7 +92,7 @@ data <- data_orig %>%
 freeR::complete(data)
 
 # Export data
-saveRDS(data, file=file.path(outdir, "GDD_1990_2018_intakes_global.Rds"))
+saveRDS(data, file=file.path(outdir, "GDD_1990_2020_intakes_global.Rds"))
 
 
 

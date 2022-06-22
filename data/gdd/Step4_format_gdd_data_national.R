@@ -37,15 +37,16 @@ unit_key <- unit_key %>%
 ################################################################################
 
 # Files to merge
-files2merge <- list.files(file.path(indir, "Regional estimates"))
+files2merge <- list.files(file.path(indir, "Country-level estimates"))
 
 # Loop through and merge
 x <- files2merge[1]
 data_orig <- purrr::map_df(files2merge, function(x){
 
   # Read data
-  fdata_orig <- read.csv(file.path(indir, "Regional estimates", x), as.is=T) %>%
-    mutate(filename=x)
+  fdata_orig <- read.csv(file.path(indir, "Country-level estimates", x), as.is=T) %>%
+    mutate(filename=x) %>%
+    filter(year==2018)
 
 })
 
@@ -56,11 +57,11 @@ data <- data_orig %>%
          supply_med=median, supply_lo=lowerci_95, supply_hi=upperci_95,
          serving_med=serving, serving_lo=s_lowerci_95, serving_hi=s_upperci_95) %>%
   # Arrange and remove useless columns
-  select(filename, region_code, age_code, sex_code, residence_code, education_code, year,
+  select(filename, region_code, iso3, age_code, sex_code, residence_code, education_code, year,
          supply_med, supply_lo, supply_hi,
          serving_med, serving_lo, serving_hi) %>%
   # Add factor into
-  mutate(factor_code=gsub("_superregion2.csv", "", filename)) %>%
+  mutate(factor_code=gsub("_cnty.csv", "", filename)) %>%
   left_join(factor_key) %>%
   mutate(factor=recode(factor,
                        "Vitamin A w/ supplements"="Vitamin A with supplements",
@@ -86,15 +87,22 @@ data <- data_orig %>%
                              education_code==3 ~ "High (12.01+ years)",
                              education_code==999 ~ "All education levels")) %>%
   # Arrange
-  select(filename, factor, factor_units, region,
+  select(filename, factor, factor_units, region, iso3,
          age_range, sex, residence, education, year,
          supply_med, supply_lo, supply_hi, serving_med, serving_lo, serving_hi)
 
 # Inspect
-freeR::complete(data)
+# freeR::complete(data)
+
+# Reduce
+# data2020 <- data %>%
+#   filter(year==2020)
+# freeR::complete(data2020)
+# table(data$iso3)
 
 # Export data
-saveRDS(data, file=file.path(outdir, "GDD_1990_2020_intakes_regional.Rds"))
+# saveRDS(data, file=file.path(outdir, "GDD_1990_2020_intakes_national.Rds"))
+saveRDS(data, file=file.path(outdir, "GDD_2018_intakes_national.Rds"))
 
 
 
