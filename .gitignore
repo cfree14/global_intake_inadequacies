@@ -2,3 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# Large data
+data/gdd/raw
+data/gdd/processed
