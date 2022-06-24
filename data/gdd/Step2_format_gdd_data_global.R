@@ -19,18 +19,6 @@ factor_key <- read.csv(file=file.path(outdir, "GDD_factor_key.csv"), as.is=T)
 country_key <- read.csv(file=file.path(outdir, "GDD_country_key.csv"), as.is=T)
 region_key <- read.csv(file=file.path(outdir, "GDD_region_key.csv"), as.is=T)
 age_key <- read.csv(file=file.path(outdir, "GDD_age_group_key.csv"), as.is=T)
-unit_key <- read.csv(file=file.path(outdir, "GDD_factor_unit_key.csv"), as.is=T)
-
-# Fix keys
-age_key <- age_key %>%
-  mutate(age_code=ifelse(age_code==2.5, 3.5, age_code))
-
-# Fix
-unit_key <- unit_key %>%
-  mutate(factor=recode(factor,
-                       "Monounsaturated fat"="Monounsaturated fatty acids",
-                       "Plant omega-3 (n-3) fat"="Plant omega-3 fatty acids",
-                       "Seafood omega-3 (n-3) fat"="Seafood omega-3 fatty acids"))
 
 
 # Merge data
@@ -62,12 +50,6 @@ data <- data_orig %>%
   # Add factor into
   mutate(factor_code=gsub("_global.csv", "", filename)) %>%
   left_join(factor_key) %>%
-  mutate(factor=recode(factor,
-                       "Vitamin A w/ supplements"="Vitamin A with supplements",
-                       "Total omega-6 fat"="Total omega-6 fatty acids",
-                       "Plant omega-3 fat"="Plant omega-3 fatty acids",
-                       "Seafood omega-3 fat"="Seafood omega-3 fatty acids")) %>%
-  left_join(unit_key) %>%
   # Add age
   left_join(age_key) %>%
   # Format sex
@@ -84,9 +66,10 @@ data <- data_orig %>%
                              education_code==3 ~ "High (12.01+ years)",
                              education_code==999 ~ "All education levels")) %>%
   # Arrange
-  select(filename, factor, factor_units,
-         age_range, sex, residence, education, year,
-         supply_med, supply_lo, supply_hi, serving_med, serving_lo, serving_hi)
+  select(filename, factor_type, factor, factor_units,
+         sex, age_range, residence, education, year,
+         supply_med, supply_lo, supply_hi, serving_med, serving_lo, serving_hi) %>%
+  arrange(factor_type, factor, sex, age_range)
 
 # Inspect
 freeR::complete(data)
