@@ -54,6 +54,7 @@ data <- data_orig %>%
   left_join(region_key) %>%
   # Add age
   left_join(age_key) %>%
+  mutate(age_range=factor(age_range, levels=age_key$age_range)) %>%
   # Format sex
   mutate(sex=case_when(sex_code==0 ~ "Male",
                        sex_code==1 ~ "Female",

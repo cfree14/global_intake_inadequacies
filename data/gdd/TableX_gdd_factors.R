@@ -27,7 +27,7 @@ data <- data_orig %>%
   # Simplify
   select(factor_type, factor, factor_units) %>%
   # Factor type
-  mutate(factor_type=factor(factor_type, levels=c("Vitamins", "Minerals", "Fatty acids", "Macronutrients", "Foods"))) %>%
+  mutate(factor_type=factor(factor_type, levels=c("Vitamins", "Minerals", "Fatty acids", "Macronutrients", "Beverages", "Foods"))) %>%
   # Rename factors
   mutate(factor=recode(factor,
                        "Folate"="Folate (vitamin B9)",
