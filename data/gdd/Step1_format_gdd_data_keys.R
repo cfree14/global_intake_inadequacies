@@ -107,8 +107,8 @@ foods <- c("Beans and legumes",  "Cheese",   "Eggs",  "Fruits", "Non-starchy veg
 beverages <- c("Coffee", "Fruit juices", "Sugar-sweetened beverages",  "Tea",  "Total milk")
 macronutrients <- c("Added sugars", "Dietary cholesterol", "Dietary fiber", "Dietary sodium", "Total carbohydrates", "Total protein")
 fatty_acids <- c("Monounsaturated fatty acids",   "Plant omega-3 fatty acids", "Saturated fat", "Seafood omega-3 fatty acids", "Total omega-6 fatty acids")
-minerals <- c("Calcium", "Iodine", "Iron", "Magnesium", "Potassium", "Selenium")
-vitamins <- c( "Folate", "Vitamin A (RAE)", "Vitamin B1", "Vitamin B12", "Vitamin B2", "Vitamin B3", "Vitamin B6", "Vitamin C", "Vitamin D", "Vitamin E", "Zinc")
+minerals <- c("Calcium", "Iodine", "Iron", "Magnesium", "Potassium", "Selenium",  "Zinc")
+vitamins <- c( "Folate", "Vitamin A (RAE)", "Vitamin B1", "Vitamin B12", "Vitamin B2", "Vitamin B3", "Vitamin B6", "Vitamin C", "Vitamin D", "Vitamin E")
 
 # Merge codes and units
 factor <- factor_codes %>%

@@ -220,6 +220,8 @@ ars_use <- bind_rows(ars_mf, ars_child_m, ars_child_f) %>%
 
 # Merge data
 data <- gdd_harmonized %>%
+  # Adjust calcium intakes
+  mutate(supply_med=ifelse(nutrient=="Calcium", supply_med+1.7*42, supply_med)) %>%
   # Add population data
   left_join(pop %>% select(-c(year, country)), by=c("iso3", "sex", "age_range")) %>%
   # Add HDI
