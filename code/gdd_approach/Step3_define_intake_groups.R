@@ -15,7 +15,7 @@ library(factoextra)
 
 # Directories
 datadir <- "data"
-plotdir <- "figures"
+plotdir <- "figures/gdd_approach"
 outdir <- "output"
 gdddir <- "data/gdd/processed"
 
@@ -100,7 +100,8 @@ g <- ggplot(diff_df, aes(x=iso1, y=iso2, fill=diss)) +
             hjust=-0.1, vjust=-0.5) +
   # Labels
   labs(x="", y="") +
-  scale_fill_gradientn(name="Euclidean\ndistance", colors=RColorBrewer::brewer.pal(n=9, name="YlOrRd")) +
+  scale_fill_gradientn(name="Euclidean\ndistance",
+                       colors=RColorBrewer::brewer.pal(n=9, name="Spectral") %>% rev()) +
   guides(fill = guide_colorbar(ticks.colour = "black", frame.colour = "black")) +
   # Theme
   theme_bw() +
@@ -119,7 +120,7 @@ g <- ggplot(diff_df, aes(x=iso1, y=iso2, fill=diss)) +
 g
 
 # Export figure
-ggsave(g, filename=file.path(plotdir, "FigSX_gdd_diss_matrix.png"),
+ggsave(g, filename=file.path(plotdir, "FigS3_gdd_diss_matrix.png"),
        width=6.5, height=6.5, units="in", dpi=600)
 
 

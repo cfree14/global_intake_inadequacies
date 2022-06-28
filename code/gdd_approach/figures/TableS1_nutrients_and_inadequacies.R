@@ -33,8 +33,7 @@ data <- data_orig %>%
   mutate(pdeficient=ndeficient/npeople) %>%
   ungroup() %>%
   # Make numbers pretty
-  mutate(ndeficient=round(ndeficient/1e9, 2),
-         pdeficient=round(pdeficient*100,1) %>% paste0(., "%")) %>%
+  mutate(ndeficient=ndeficient/1e9) %>%
   # Add nutrient label/tyep
   mutate(nutrient_label=recode(nutrient,
                                "Folate"="Folate (vitamin B9)",
