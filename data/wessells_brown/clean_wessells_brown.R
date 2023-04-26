@@ -12,6 +12,7 @@ library(tidyverse)
 
 # Directories
 datadir <- "data/wessells_brown"
+gisdir <- "data/world/processed"
 
 # Get data
 data_orig <- readxl::read_excel(file.path(datadir, "Wessells_Brown_2012_Table_S2.xls"))
@@ -38,3 +39,22 @@ data <- data_orig %>%
 
 # Export
 saveRDS(data, file=file.path(datadir, "wessells_brown_2012_zinc_absorption.Rds"))
+
+
+
+
+# Visualize data
+################################################################################
+
+# Read world data
+world_lg <- readRDS(file=file.path(gisdir, "world_large.Rds"))
+world_sm <- readRDS(file=file.path(gisdir, "world_small.Rds"))
+world_centers <- readRDS(file=file.path(gisdir, "world_centroids.Rds"))
+
+
+
+
+
+
+
+

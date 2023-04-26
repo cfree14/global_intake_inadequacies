@@ -29,24 +29,48 @@ world_tiny_orig <- rnaturalearth::ne_countries(type="tiny_countries", returnclas
 # Format world (small) - for plotting
 world_sm <- world_sm_orig %>%
   # Simplify
-  select(iso3=su_a3,
+  select(iso3_orig=su_a3,
          country_orig=subunit) %>%
-  # Correct country
-  mutate(country=countrycode::countrycode(iso3, "iso3c", "country.name"),
-         country=ifelse(is.na(country), country_orig, country))
+  # Look up ISO3 and country
+  mutate(country_corr=countrycode::countrycode(country_orig, "country.name", "country.name"),
+         iso3_corr=countrycode::countrycode(country_corr, "country.name", "iso3c")) %>%
+  # Pick
+  mutate(country=ifelse(!is.na(country_corr), country_corr, country_orig),
+         iso3=ifelse(!is.na(iso3_corr), iso3_corr, iso3_orig)) %>%
+  # Simplify
+  select(country_orig, iso3_orig, country, iso3, everything()) %>%
+  # Fix Cyprus
+  mutate(iso3=ifelse(country_orig=="Northern Cyprus", iso3_orig, iso3),
+         country=ifelse(country_orig=="Northern Cyprus", country_orig, country)) %>%
+  # Simplify
+  select(iso3, country, geometry)
+
+# Check
 freeR::which_duplicated(world_sm$iso3)
 freeR::which_duplicated(world_sm$country)
 
 # Format world (large) - for centroids
 world_lg <- world_lg_orig %>%
   # Simplify
-  select(iso3=su_a3,
+  select(iso3_orig=su_a3,
          country_orig=subunit) %>%
-  # Correct country
-  mutate(country=countrycode::countrycode(iso3, "iso3c", "country.name"),
-         country=ifelse(is.na(country), country_orig, country)) %>%
+  # Look up ISO3 and country
+  mutate(country_corr=countrycode::countrycode(country_orig, "country.name", "country.name"),
+         iso3_corr=countrycode::countrycode(country_corr, "country.name", "iso3c")) %>%
+  # Pick
+  mutate(country=ifelse(!is.na(country_corr), country_corr, country_orig),
+         iso3=ifelse(!is.na(iso3_corr), iso3_corr, iso3_orig)) %>%
   # Add area
-  mutate(area_sqkm=sf::st_area(.) %>% as.numeric() %>% measurements::conv_unit(., from="m2", to="km2"))
+  mutate(area_sqkm=sf::st_area(.) %>% as.numeric() %>% measurements::conv_unit(., from="m2", to="km2")) %>%
+  # Simplify
+  select(country_orig, iso3_orig, country, iso3, everything()) %>%
+  # Fix Cyprus
+  mutate(iso3=ifelse(country_orig %in% c("Northern Cyprus", "Cyprus No Mans Area", "US Naval Base Guantanamo Bay"), iso3_orig, iso3),
+         country=ifelse(country_orig %in% c("Northern Cyprus", "Cyprus No Mans Area", "US Naval Base Guantanamo Bay"), country_orig, country)) %>%
+  # Simplify
+  select(iso3, country, area_sqkm, geometry)
+
+# Check
 freeR::which_duplicated(world_lg$iso3)
 freeR::which_duplicated(world_lg$country)
 
@@ -60,7 +84,14 @@ world_tiny <- world_tiny_orig  %>%
          country=ifelse(is.na(country), country_orig, country)) %>%
   # Add lat/long
   mutate(long_dd = sf::st_coordinates(.)[,1],
-         lat_dd = sf::st_coordinates(.)[,2])
+         lat_dd = sf::st_coordinates(.)[,2]) %>%
+  # Simplify
+  select(iso3, country, long_dd, lat_dd, geometry)
+
+# Check
+freeR::which_duplicated(world_tiny$iso3)
+freeR::which_duplicated(world_tiny$country)
+
 
 # Centroids - large
 world_lg_centroids <- world_lg %>%
