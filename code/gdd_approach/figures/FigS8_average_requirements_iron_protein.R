@@ -34,10 +34,10 @@ agesex_key <- pop_orig %>%
   unique() %>%
   arrange(sex, age)
 
-# Zinc data
-zinc_ars <- ars_orig %>%
+# Iron data
+iron_ars <- ars_orig %>%
   # Zinc ARs for non-stages
-  filter(grepl("Zinc", nutrient) & nrv_type=="Average requirement" & !stage %in% c("Pregnancy", "Lactation")) %>%
+  filter(grepl("Iron", nutrient) & nrv_type=="Average requirement" & !stage %in% c("Pregnancy", "Lactation")) %>%
   # Spread
   select(sex, age_group, nutrient, nrv) %>%
   spread(key=nutrient, value=nrv)
@@ -45,8 +45,8 @@ zinc_ars <- ars_orig %>%
 # Build data
 data <- agesex_key %>%
   # Add columns for joining zinc ARs
-  mutate(sex_zinc=ifelse(age %in% c("0-4", "5-9"), "Children", sex),
-         age_zinc=recode(age,
+  mutate(sex_iron=ifelse(age %in% c("0-4", "5-9"), "Children", sex),
+         age_iron=recode(age,
                          "0-4"="1-3 y",
                          "5-9"="7-10 y",
                          "10-14"="11-14 y",
@@ -65,77 +65,76 @@ data <- agesex_key %>%
                          "75-79"=">70 y",
                          "80+"=">70 y")) %>%
   # Add NRV
-  left_join(zinc_ars, by=c("sex_zinc"="sex", "age_zinc"="age_group")) %>%
+  left_join(iron_ars, by=c("sex_iron"="sex", "age_iron"="age_group")) %>%
   # Gather
-  gather(key="diet_type", value="ar_mg", 5:ncol(.)) %>%
+  gather(key="abs_level", value="ar_mg", 5:ncol(.)) %>%
   # Format diet type
-  mutate(diet_type=recode_factor(diet_type,
-                                 "Zinc (refined diet)"="Refined (300 mg phytate/d)",
-                                 "Zinc (semi-refined diet)"="Semi-refined (600 mg phytate/d)",
-                                 "Zinc (semi-unrefined diet)"="Semi-unrefined (900 mg phytate/d)",
-                                 "Zinc (unrefined diet)"="Unrefined (1200 mg phytate/d)")) %>%
+  mutate(abs_level=recode_factor(abs_level,
+                                 "Iron (low absorption)"="Low (5%)",
+                                 "Iron (moderate absorption)"="Moderate (10%)",
+                                 "Iron (high absorption)"="High (16%)")) %>%
   # Add AR type
   mutate(ar_type=ifelse(!is.na(ar_mg), "Reported", "Derived")) %>%
   # Derive AR type
   # First, find refence value
   group_by(sex) %>%
-  mutate(ar_mg_ref=ar_mg[diet_type=="Semi-unrefined (900 mg phytate/d)" & age=="30-34"]) %>%
+  mutate(ar_mg_ref=ar_mg[abs_level=="Moderate (10%)" & age=="25-29"]) %>%
   ungroup() %>%
   # Second, derive adjustment factor
-  group_by(sex, diet_type) %>%
+  group_by(sex, abs_level) %>%
   mutate(ar_mg_adj=ar_mg[age=="30-34"]-ar_mg_ref) %>%
   ungroup() %>%
   # Third adjust with factor
   group_by(sex) %>%
-  mutate(ar_mg=ifelse(ar_type=="Derived", ar_mg[diet_type=="Semi-unrefined (900 mg phytate/d)"]+ar_mg_adj, ar_mg)) %>%
+  mutate(ar_mg=ifelse(ar_type=="Derived", ar_mg[abs_level=="Moderate (10%)"]+ar_mg_adj, ar_mg)) %>%
   ungroup() %>%
   # Add AR group
-  mutate(ar_group=paste(diet_type, ar_type, sep="-"))
+  mutate(ar_group=paste(abs_level, ar_type, sep="-"))
 
 
 
 # Derive AR based on HDI
 ################################################################################
 
-# Function to derive AR based on HDI
-hdi <- 0.54
-derive_ar_zinc <- function(sex, age, hdi){
+# Function to derive AR based on protein
+protein <- 50; sex <- "Males"; age <- "5-9"
+derive_ar_iron <- function(sex, age, protein){
 
-  # HDI range
-  hdi_range <- c(0.394, 0.957)
-  hdi_min <- hdi_range[1]
-  hdi_max <- hdi_range[2]
+  # protein range
+  protein_range <- c(24, 120)
+  protein_min <- protein_range[1]
+  protein_max <- protein_range[2]
 
   # Age/sex
   sex_do <- sex
   age_do <- age
 
-  # Loweest AR (refined diet, high HDI)
+  # Lowest AR (high absorption, high protein)
   ar_lo <- data %>%
-    filter(sex==sex_do & age==age_do & diet_type=="Refined (300 mg phytate/d)") %>% pull(ar_mg)
+    filter(sex==sex_do & age==age_do & abs_level=="High (16%)") %>% pull(ar_mg)
 
-  # Highest AR (unrefined diet, low HDI)
+  # Highest AR (low absorption, low protein)
   ar_hi <- data %>%
-    filter(sex==sex_do & age==age_do & diet_type=="Unrefined (1200 mg phytate/d)") %>% pull(ar_mg)
+    filter(sex==sex_do & age==age_do & abs_level=="Low (5%)") %>% pull(ar_mg)
 
-  x <- c(hdi_max, hdi_min)
+  x <- c(protein_max, protein_min)
   y <- c(ar_lo, ar_hi)
 
   # Interpolate AR
-  ar <- approx(x, y, xout = hdi)$y
+  ar <- approx(x, y, xout = protein)$y
 
   # Return
   return(ar)
 
 }
 
-# Build HDI dataframe
-hdi_ars <- expand.grid(hdi=seq(0.4, 0.9, 0.1),
+# Build protein dataframe
+protein_ars <- expand.grid(protein=seq(40, 120, 20),
                        sex=c("Males", "Females"),
                        age=unique(agesex_key$age)) %>%
-  arrange(hdi, sex, age) %>%
+  arrange(protein, sex, age) %>%
   rowwise() %>%
-  mutate(ar_mg=derive_ar_zinc(sex=sex, age=age, hdi=hdi)) %>%
+  mutate(ar_mg=derive_ar_iron(sex=sex, age=age, protein=protein)) %>%
   ungroup()
 
 
@@ -160,24 +159,24 @@ my_theme <- theme(axis.text=element_text(size=6),
                   legend.background = element_rect(fill=alpha('blue', 0)))
 
 # Plot data
-g <- ggplot(data, aes(x=age, y=ar_mg, size=diet_type, group=diet_type)) +
+g <- ggplot(data, aes(x=age, y=ar_mg, size=abs_level, group=abs_level)) +
   facet_wrap(~sex) +
   geom_line() +
-  # Plot HDI
-  geom_line(data=hdi_ars, mapping=aes(x=age, y=ar_mg, color=hdi, group=hdi), inherit.aes = F) +
+  # Plot protein
+  geom_line(data=protein_ars, mapping=aes(x=age, y=ar_mg, color=protein, group=protein), inherit.aes = F, size=0.4) +
   # Range
   lims(y=c(0,NA)) +
   # Labels
   labs(x="Age range", y="Average requirement (mg)") +
   # Legend
-  scale_size_manual(name="Diet type", values=seq(0.2, 1.5, length.out=4)) +
+  scale_size_manual(name="Absorption level", values=seq(0.4, 1.5, length.out=3)) +
   scale_linetype_manual(name="AR type", values=c("dotted", "solid")) +
-  scale_color_gradientn(name="HDI", colors = RColorBrewer::brewer.pal(9, "Spectral")) +
+  scale_color_gradientn(name="Protein supply (g)", colors = RColorBrewer::brewer.pal(9, "Reds")[4:9]) +
   guides(color = guide_colorbar(ticks.colour = "black", frame.colour = "black")) +
   # Theme
   theme_bw() + my_theme
 g
 
 # Export figure
-ggsave(g, filename=file.path(plotdir, "FigS7_average_requirements_zinc.png"),
+ggsave(g, filename=file.path(plotdir, "FigS8_average_requirements_iron_protein.png"),
        width=6.5, height=3, units="in", dpi=600)

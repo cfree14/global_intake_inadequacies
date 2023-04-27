@@ -16,7 +16,7 @@ gdddir <- "data/gdd/processed"
 hdidir <- "data/human_development_index"
 outdir <- "output"
 plotdir <- "figures"
-tabledir <- "tables"
+tabledir <- "tables/gdd_approach"
 
 # Read GDD data
 gdd_orig <- readRDS(file=file.path(gdddir, "GDD_2018_intakes_national_for_analysis.Rds"))
@@ -71,7 +71,7 @@ isos2match <- pop_orig %>%
 write.csv(isos2match, file=file.path(tabledir, "TableSX_countries_without_gdd_data.csv"), row.names=F)
 
 # Read GDD country match key
-gdd_match_key <- readxl::read_excel(file.path(tabledir, "TableSX_countries_without_gdd_data.xlsx"), skip=1) %>%
+gdd_match_key <- readxl::read_excel(file.path(tabledir, "TableS3_countries_without_gdd_data.xlsx"), skip=1) %>%
   # Rename
   setNames(c("iso1", "country1", "iso2", "country2"))
 

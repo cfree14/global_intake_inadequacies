@@ -35,9 +35,9 @@ agesex_key <- pop_orig %>%
   arrange(sex, age)
 
 # Zinc data
-iron_ars <- ars_orig %>%
+zinc_ars <- ars_orig %>%
   # Zinc ARs for non-stages
-  filter(grepl("Iron", nutrient) & nrv_type=="Average requirement" & !stage %in% c("Pregnancy", "Lactation")) %>%
+  filter(grepl("Zinc", nutrient) & nrv_type=="Average requirement" & !stage %in% c("Pregnancy", "Lactation")) %>%
   # Spread
   select(sex, age_group, nutrient, nrv) %>%
   spread(key=nutrient, value=nrv)
@@ -45,8 +45,8 @@ iron_ars <- ars_orig %>%
 # Build data
 data <- agesex_key %>%
   # Add columns for joining zinc ARs
-  mutate(sex_iron=ifelse(age %in% c("0-4", "5-9"), "Children", sex),
-         age_iron=recode(age,
+  mutate(sex_zinc=ifelse(age %in% c("0-4", "5-9"), "Children", sex),
+         age_zinc=recode(age,
                          "0-4"="1-3 y",
                          "5-9"="7-10 y",
                          "10-14"="11-14 y",
@@ -65,31 +65,32 @@ data <- agesex_key %>%
                          "75-79"=">70 y",
                          "80+"=">70 y")) %>%
   # Add NRV
-  left_join(iron_ars, by=c("sex_iron"="sex", "age_iron"="age_group")) %>%
+  left_join(zinc_ars, by=c("sex_zinc"="sex", "age_zinc"="age_group")) %>%
   # Gather
-  gather(key="abs_level", value="ar_mg", 5:ncol(.)) %>%
+  gather(key="diet_type", value="ar_mg", 5:ncol(.)) %>%
   # Format diet type
-  mutate(abs_level=recode_factor(abs_level,
-                                 "Iron (low absorption)"="Low (5%)",
-                                 "Iron (moderate absorption)"="Moderate (10%)",
-                                 "Iron (high absorption)"="High (16%)")) %>%
+  mutate(diet_type=recode_factor(diet_type,
+                                 "Zinc (refined diet)"="Refined (300 mg phytate/d)",
+                                 "Zinc (semi-refined diet)"="Semi-refined (600 mg phytate/d)",
+                                 "Zinc (semi-unrefined diet)"="Semi-unrefined (900 mg phytate/d)",
+                                 "Zinc (unrefined diet)"="Unrefined (1200 mg phytate/d)")) %>%
   # Add AR type
   mutate(ar_type=ifelse(!is.na(ar_mg), "Reported", "Derived")) %>%
   # Derive AR type
   # First, find refence value
   group_by(sex) %>%
-  mutate(ar_mg_ref=ar_mg[abs_level=="Moderate (10%)" & age=="25-29"]) %>%
+  mutate(ar_mg_ref=ar_mg[diet_type=="Semi-unrefined (900 mg phytate/d)" & age=="30-34"]) %>%
   ungroup() %>%
   # Second, derive adjustment factor
-  group_by(sex, abs_level) %>%
+  group_by(sex, diet_type) %>%
   mutate(ar_mg_adj=ar_mg[age=="30-34"]-ar_mg_ref) %>%
   ungroup() %>%
   # Third adjust with factor
   group_by(sex) %>%
-  mutate(ar_mg=ifelse(ar_type=="Derived", ar_mg[abs_level=="Moderate (10%)"]+ar_mg_adj, ar_mg)) %>%
+  mutate(ar_mg=ifelse(ar_type=="Derived", ar_mg[diet_type=="Semi-unrefined (900 mg phytate/d)"]+ar_mg_adj, ar_mg)) %>%
   ungroup() %>%
   # Add AR group
-  mutate(ar_group=paste(abs_level, ar_type, sep="-"))
+  mutate(ar_group=paste(diet_type, ar_type, sep="-"))
 
 
 
@@ -97,8 +98,8 @@ data <- agesex_key %>%
 ################################################################################
 
 # Function to derive AR based on HDI
-hdi <- 0.54; sex <- "Males"; age <- "5-9"
-derive_ar_iron <- function(sex, age, hdi){
+hdi <- 0.54
+derive_ar_zinc <- function(sex, age, hdi){
 
   # HDI range
   hdi_range <- c(0.394, 0.957)
@@ -109,13 +110,13 @@ derive_ar_iron <- function(sex, age, hdi){
   sex_do <- sex
   age_do <- age
 
-  # Lowest AR (high absorption, high HDI)
+  # Loweest AR (refined diet, high HDI)
   ar_lo <- data %>%
-    filter(sex==sex_do & age==age_do & abs_level=="High (16%)") %>% pull(ar_mg)
+    filter(sex==sex_do & age==age_do & diet_type=="Refined (300 mg phytate/d)") %>% pull(ar_mg)
 
-  # Highest AR (low absorption, low HDI)
+  # Highest AR (unrefined diet, low HDI)
   ar_hi <- data %>%
-    filter(sex==sex_do & age==age_do & abs_level=="Low (5%)") %>% pull(ar_mg)
+    filter(sex==sex_do & age==age_do & diet_type=="Unrefined (1200 mg phytate/d)") %>% pull(ar_mg)
 
   x <- c(hdi_max, hdi_min)
   y <- c(ar_lo, ar_hi)
@@ -134,7 +135,7 @@ hdi_ars <- expand.grid(hdi=seq(0.4, 0.9, 0.1),
                        age=unique(agesex_key$age)) %>%
   arrange(hdi, sex, age) %>%
   rowwise() %>%
-  mutate(ar_mg=derive_ar_iron(sex=sex, age=age, hdi=hdi)) %>%
+  mutate(ar_mg=derive_ar_zinc(sex=sex, age=age, hdi=hdi)) %>%
   ungroup()
 
 
@@ -159,17 +160,17 @@ my_theme <- theme(axis.text=element_text(size=6),
                   legend.background = element_rect(fill=alpha('blue', 0)))
 
 # Plot data
-g <- ggplot(data, aes(x=age, y=ar_mg, size=abs_level, group=abs_level)) +
+g <- ggplot(data, aes(x=age, y=ar_mg, size=diet_type, group=diet_type)) +
   facet_wrap(~sex) +
   geom_line() +
   # Plot HDI
-  geom_line(data=hdi_ars, mapping=aes(x=age, y=ar_mg, color=hdi, group=hdi), inherit.aes = F, size=0.4) +
+  geom_line(data=hdi_ars, mapping=aes(x=age, y=ar_mg, color=hdi, group=hdi), inherit.aes = F) +
   # Range
   lims(y=c(0,NA)) +
   # Labels
   labs(x="Age range", y="Average requirement (mg)") +
   # Legend
-  scale_size_manual(name="Absorption level", values=seq(0.4, 1.5, length.out=3)) +
+  scale_size_manual(name="Diet type", values=seq(0.2, 1.5, length.out=4)) +
   scale_linetype_manual(name="AR type", values=c("dotted", "solid")) +
   scale_color_gradientn(name="HDI", colors = RColorBrewer::brewer.pal(9, "Spectral")) +
   guides(color = guide_colorbar(ticks.colour = "black", frame.colour = "black")) +
@@ -178,5 +179,5 @@ g <- ggplot(data, aes(x=age, y=ar_mg, size=abs_level, group=abs_level)) +
 g
 
 # Export figure
-ggsave(g, filename=file.path(plotdir, "FigS8_average_requirements_iron.png"),
+ggsave(g, filename=file.path(plotdir, "FigS7_average_requirements_zinc_hdi.png"),
        width=6.5, height=3, units="in", dpi=600)
