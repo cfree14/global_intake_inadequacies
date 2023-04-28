@@ -40,7 +40,7 @@ diet_factors <- data %>%
 table(diet_factors$factor_type)
 
 
-# Subset
+# Build data
 sdata <- data %>%
   filter(factor=="Total protein" & residence=="All residences" & education=="All education levels" & sex!="Both sexes" & age_range!="All ages")
 
@@ -60,12 +60,13 @@ sdata <- data %>%
 #   # Theme
 #   theme_bw()
 
-# Country average
+# Calculate country average
 sdata <- data %>%
   filter(factor=="Total protein" & residence=="All residences" & education=="All education levels" & sex=="Both sexes" & age_range=="All ages") %>%
   mutate(supply_med_cap=pmin(120, supply_med))
 
-
+# Export data
+saveRDS(sdata, file=file.path(datadir, "GDD_total_protein_avg.Rds"))
 
 
 # Visualize data
@@ -73,6 +74,7 @@ sdata <- data %>%
 
 # Data
 world_sm <- world_sm_orig %>%
+  sf::st_as_sf() %>%
   left_join(sdata %>% select(-country), by="iso3")
 world_centers <- world_centers_orig %>%
   left_join(sdata %>% select(iso3, supply_med, supply_med_cap)) %>%
@@ -100,7 +102,7 @@ g1 <- ggplot(sdata, aes(x=supply_med)) +
   # Reference line
   geom_vline(xintercept = c(120), linetype="dotted") +
   # Labels
-  labs(x="Total protein supply (g)", y="Density", tag="A") +
+  labs(x="Total protein supply (g/day)", y="Density", tag="A") +
   # Axes
   scale_x_continuous(breaks=seq(0,250,50), lim=c(0, 250)) +
   # Theme
@@ -115,8 +117,8 @@ g2 <- ggplot(world_sm, aes(fill=supply_med_cap)) +
   # Labels
   labs(x="", y="", tag="B") +
   # Legend
-  scale_fill_gradientn(name="Protein supply (g)", colors=RColorBrewer::brewer.pal(9, "Spectral") %>% rev(), na.value="grey80",
-                       breaks=seq(40, 120, 20), labels=c(seq(40, 100, 20), ">120")) +
+  scale_fill_gradientn(name="Protein supply (g/day)", colors=RColorBrewer::brewer.pal(9, "Spectral") %>% rev(), na.value="grey80",
+                       breaks=seq(40, 120, 20), labels=c(seq(40, 100, 20), "≥120")) +
   guides(fill = guide_colorbar(ticks.colour = "black", frame.colour = "black", title.position="top")) +
   # Crop
   coord_sf(ylim=c(-52, 80), expand = T) +
@@ -132,7 +134,7 @@ g <- gridExtra::grid.arrange(g1, g2, nrow=1, widths=c(0.25, 0.75))
 g
 
 # Export
-ggsave(g, filename=file.path(plotdir, "FigSX_gdd_total_protein.png"),
+ggsave(g, filename=file.path(plotdir, "FigS10_gdd_total_protein.png"),
        width=6.5, height=2.25, units="in", dpi=600)
 
 

@@ -13,58 +13,10 @@ library(tidyverse)
 # Directories
 datadir <- "data/wessells_brown"
 gisdir <- "data/world/processed"
-
-# Get data
-data_orig <- readxl::read_excel(file.path(datadir, "Wessells_Brown_2012_Table_S2.xls"))
-
-
-# Format data
-################################################################################
-
-# Format data
-data <- data_orig %>%
-  # Rename
-  janitor::clean_names("snake") %>%
-  # Simplify
-  select(country, year, phytate_mg, estimated_fractional_absorption) %>%
-  # Format year
-  mutate(year=gsub('b', "", year) %>% as.numeric()) %>%
-  # Rename
-  rename(country_orig=country) %>%
-  # Add ISO3 and country
-  mutate(country=countrycode::countrycode(country_orig, "country.name", "country.name"),
-         iso3=countrycode::countrycode(country, "country.name", "iso3c")) %>%
-  # Fill missing country
-  mutate(country=ifelse(is.na(country), country_orig, country)) %>%
-  # Fill missing ISO3
-  mutate(iso3=case_when(country=="Czechoslovakia"~"CSK",
-                        country=="Netherlands Antilles"~"ANT",
-                        country=="Serbia and Montenegro"~"SCG",
-                        country=="Yugoslavia"~"YUG",
-                        country=="Belgium-Luxembourg"~"BEL-LUX",
-                        T~iso3)) %>%
-  # Get most recent
-  group_by(country) %>%
-  arrange(country, desc(year)) %>%
-  slice(1) %>%
-  ungroup() %>%
-  # Simplify
-  select(country_orig, country, iso3, year, estimated_fractional_absorption, everything())
-
-# Insepct
-freeR::which_duplicated(data$iso3)
-freeR::which_duplicated(data$country)
-table(data$year)
-freeR::complete(data)
+plotdir <- "figures/gdd_approach"
 
 # Export
-saveRDS(data, file=file.path(datadir, "wessells_brown_2012_zinc_absorption.Rds"))
-
-
-
-
-# Visualize data
-################################################################################
+data <- readRDS(file=file.path(datadir, "wessells_brown_2012_zinc_absorption.Rds"))
 
 # Read world data
 world_lg_orig <- readRDS(file=file.path(gisdir, "world_large.Rds"))
@@ -105,7 +57,8 @@ g <- ggplot(world_sm, aes(fill=estimated_fractional_absorption)) +
   geom_point(data=world_centers, mapping=aes(x=long_dd, y=lat_dd, fill=estimated_fractional_absorption),
              color="grey30", size=1.5, pch=21) +
   # Legend
-  scale_fill_gradientn(name="Estimated fractional absorption", colors=RColorBrewer::brewer.pal(9, "Blues"),  na.value="grey80") +
+  scale_fill_gradientn(name="Estimated fractional absorption\n(Wessells & Brown 2012)",
+                       colors=RColorBrewer::brewer.pal(9, "Blues"),  na.value="grey80") +
   guides(fill = guide_colorbar(ticks.colour = "black", frame.colour = "black")) +
   # Crop
   coord_sf(ylim=c(-52, 80)) +
@@ -114,8 +67,13 @@ g <- ggplot(world_sm, aes(fill=estimated_fractional_absorption)) +
 g
 
 # Export
-ggsave(g, filename=file.path(datadir, "wessells_brown_estimated_fractional_absorption.png"),
+ggsave(g, filename=file.path(plotdir, "FigS9_zinc_absroption_map.png"),
        width=6.5, height=2, units="in", dpi=600)
+
+
+
+
+
 
 
 

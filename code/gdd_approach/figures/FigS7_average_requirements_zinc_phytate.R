@@ -92,8 +92,71 @@ data <- agesex_key %>%
   group_by(sex) %>%
   mutate(ar_mg=ifelse(ar_type=="Derived", ar_mg[diet_type=="Semi-unrefined (900 mg phytate/d)"]+ar_mg_adj, ar_mg)) %>%
   ungroup() %>%
-  # Add AR group
-  mutate(ar_group=paste(diet_type, ar_type, sep="-"))
+  # Add phytate mg
+  mutate(phytate_mg=recode(diet_type %>% as.character(),
+                           "Refined (300 mg phytate/d)"="300",
+                           "Semi-refined (600 mg phytate/d)"="600",
+                           "Semi-unrefined (900 mg phytate/d)"="900",
+                           "Unrefined (1200 mg phytate/d)"="1200") %>% as.numeric())
+
+
+
+
+
+# For if you decide to expand up to 4500 mg/day
+################################################################################
+
+# Confirm that ARs scale linearly with
+ggplot(data, aes(x=phytate_mg, y=ar_mg, linetype=sex, color=age_zinc)) +
+  geom_line() +
+  geom_point() +
+  # Labels
+  labs(x="Phytate intake (mg)", y="Average requirement (mg)") +
+  scale_x_continuous(lim=c(0, NA), breaks=seq(0, 1500, 300)) +
+  # Theme
+  theme_bw()
+
+# Loop through sex-ages and project to 4500 mg/day
+key <- data %>%
+  select(sex, age) %>% unique
+x <- 1
+ars4500mg <- purrr::map_df(1:nrow(key), function(x){
+
+  # Get data
+  sex_do <- key$sex[x]
+  age_do <- key$age[x]
+  sdata <- data %>%
+    filter(sex==sex_do & age==age_do)
+
+  # Fit model
+  lmfit <- lm(ar_mg ~ phytate_mg, sdata)
+
+  # Predict
+  ar_pred <- predict(lmfit, newdata = tibble(phytate_mg=4500))
+
+  # Record results
+  df <- tibble(sex=sex_do,
+               age=age_do,
+               phytate_mg=4500,
+               ar_mg=ar_pred)
+
+})
+
+# Expand
+# This is for if you decide to expand up to 4500
+ars4500mg_exp <- ars4500mg %>%
+    mutate(diet_type="Ultra-unrefined (4500 mg phytate/d)",
+           ar_type="Derived")
+
+# Build data
+data_exp <- bind_rows(data %>% select(diet_type, phytate_mg, sex, age, ar_type, ar_mg),
+                  ars4500mg_exp) %>%
+  mutate(diet_type=factor(diet_type,
+                          levels=c("Refined (300 mg phytate/d)",
+                                   "Semi-refined (600 mg phytate/d)",
+                                   "Semi-unrefined (900 mg phytate/d)",
+                                   "Unrefined (1200 mg phytate/d)",
+                                   "Ultra-unrefined (4500 mg phytate/d)")))
 
 
 
@@ -101,13 +164,13 @@ data <- agesex_key %>%
 ################################################################################
 
 # Function to derive AR based on HDI
-frac <- 20; sex <- "Females"; age <- "15-19"
-derive_ar_zinc <- function(sex, age, frac){
+phytate <- 3000; sex <- "Females"; age <- "15-19"
+derive_ar_zinc <- function(sex, age, phytate){
 
-  # Fraction range
-  frac_range <- range(wessels$estimated_fractional_absorption)
-  frac_min <- frac_range[1]
-  frac_max <- frac_range[2]
+  # Phytate range
+  phytate_range <- range(wessels$phytate_mg)
+  phytate_min <- phytate_range[1]
+  phytate_max <- phytate_range[2]
 
   # Age/sex
   sex_do <- sex
@@ -121,25 +184,25 @@ derive_ar_zinc <- function(sex, age, frac){
   ar_hi <- data %>%
     filter(sex==sex_do & age==age_do & diet_type=="Unrefined (1200 mg phytate/d)") %>% pull(ar_mg)
 
-  x <- c(frac_max, frac_min)
+  x <- c(phytate_min, phytate_max)
   y <- c(ar_lo, ar_hi)
 
   # Interpolate AR
-  ar <- approx(x, y, xout = frac)$y
+  ar <- approx(x, y, xout = phytate)$y
 
   # Return
   return(ar)
 
 }
 
-# Build FRAC dataframe
-range(wessels$estimated_fractional_absorption)
-frac_ars <- expand.grid(frac=seq(15, 35, 5),
+# Build phytate dataframe
+range(wessels$phytate_mg)
+phytate_ars <- expand.grid(phytate=seq(1000, 4000, 500),
                        sex=c("Males", "Females"),
                        age=unique(agesex_key$age)) %>%
-  arrange(frac, sex, age) %>%
+  arrange(phytate, sex, age) %>%
   rowwise() %>%
-  mutate(ar_mg=derive_ar_zinc(sex=sex, age=age, frac=frac)) %>%
+  mutate(ar_mg=derive_ar_zinc(sex=sex, age=age, phytate=phytate)) %>%
   ungroup()
 
 
@@ -167,46 +230,41 @@ my_theme <- theme(axis.text=element_text(size=6),
 g <- ggplot(data, aes(x=age, y=ar_mg, size=diet_type, group=diet_type)) +
   facet_wrap(~sex) +
   geom_line() +
-  # Plot FRAC
-  geom_line(data=frac_ars, mapping=aes(x=age, y=ar_mg, color=frac, group=frac), inherit.aes = F) +
+  # Plot phytate
+  geom_line(data=phytate_ars, mapping=aes(x=age, y=ar_mg, color=phytate, group=phytate), inherit.aes = F) +
   # Range
   lims(y=c(0,NA)) +
   # Labels
   labs(x="Age range", y="Average requirement (mg)") +
   # Legend
-  scale_size_manual(name="Diet type", values=seq(0.2, 1.5, length.out=4)) +
+  scale_size_manual(name="Diet type", values=seq(0.2, 1.5, length.out=5)) +
   scale_linetype_manual(name="AR type", values=c("dotted", "solid")) +
-  scale_color_gradientn(name="Fractional absorption\n(Wessells & Brown 2012)", colors = RColorBrewer::brewer.pal(9, "Spectral")) +
+  scale_color_gradientn(name="Phytate intake (mg/d)\n(Wessells & Brown 2012)", colors = RColorBrewer::brewer.pal(9, "Spectral")) +
   guides(color = guide_colorbar(ticks.colour = "black", frame.colour = "black")) +
   # Theme
   theme_bw() + my_theme
 g
 
 # Export figure
-ggsave(g, filename=file.path(plotdir, "FigS7_average_requirements_zinc_frac.png"),
+ggsave(g, filename=file.path(plotdir, "FigS7_average_requirements_zinc_phytate.png"),
        width=6.5, height=3, units="in", dpi=600)
-
-
-
-
-
 
 
 # Build ARS for paper
 ################################################################################
 
-# Build FRAC dataframe
-frac_all <- unique(wessels$estimated_fractional_absorption) %>% sort()
-frac_ars <- expand.grid(frac=frac_all,
+# Build phytate dataframe
+phytate_all <- unique(wessels$phytate_mg) %>% sort()
+phytate_ars <- expand.grid(phytate=phytate_all,
                         sex=c("Males", "Females"),
                         age=unique(agesex_key$age)) %>%
-  arrange(frac, sex, age) %>%
+  arrange(phytate, sex, age) %>%
   rowwise() %>%
-  mutate(ar_mg=derive_ar_zinc(sex=sex, age=age, frac=frac)) %>%
+  mutate(ar_mg=derive_ar_zinc(sex=sex, age=age, phytate=phytate)) %>%
   ungroup()
 
 # Export
-saveRDS(frac_ars, file="data/wessells_brown/zinc_ars_absorption.Rds")
+saveRDS(phytate_ars, file="data/wessells_brown/zinc_ars_phytate.Rds")
 
 # Theme
 my_theme <- theme(axis.text=element_text(size=6),
@@ -228,8 +286,8 @@ my_theme <- theme(axis.text=element_text(size=6),
 # Plot data
 g <- ggplot(data, aes(x=age, y=ar_mg, size=diet_type, group=diet_type)) +
   facet_wrap(~sex) +
-  # Plot FRAC
-  geom_line(data=frac_ars, mapping=aes(x=age, y=ar_mg, color=frac, group=frac), inherit.aes = F) +
+  # Plot phytate
+  geom_line(data=phytate_ars, mapping=aes(x=age, y=ar_mg, color=phytate, group=phytate), inherit.aes = F) +
   # Plot AR lines
   geom_line() +
   # Range
@@ -237,15 +295,14 @@ g <- ggplot(data, aes(x=age, y=ar_mg, size=diet_type, group=diet_type)) +
   # Labels
   labs(x="Age range", y="Average requirement (mg)") +
   # Legend
-  scale_size_manual(name="Diet type", values=seq(0.2, 1.5, length.out=4)) +
-  scale_linetype_manual(name="AR type", values=c("dotted", "solid")) +
-  scale_color_gradientn(name="Fractional absorption\n(Wessells & Brown 2012)", colors = RColorBrewer::brewer.pal(9, "Spectral")) +
-  guides(color = guide_colorbar(ticks.colour = "black", frame.colour = "black")) +
+  scale_size_manual(name="Diet type\n(Allen et al. 2020)", values=seq(0.2, 1.5, length.out=5)) +
+  scale_color_gradientn(name="Phytate intake (mg)\n(Wessells & Brown 2012)", colors = RColorBrewer::brewer.pal(9, "Spectral")) +
+  guides(color = guide_colorbar(ticks.colour = "black", frame.colour = "black", order=2), size=guide_legend(order=1)) +
   # Theme
   theme_bw() + my_theme
 g
 
 # Export figure
-ggsave(g, filename=file.path(plotdir, "FigS7_average_requirements_zinc_frac_all.png"),
+ggsave(g, filename=file.path(plotdir, "FigS7_average_requirements_zinc_phytate_all.png"),
        width=6.5, height=3, units="in", dpi=600)
 

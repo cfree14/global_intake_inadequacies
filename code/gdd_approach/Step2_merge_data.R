@@ -28,12 +28,21 @@ pop_orig <- readRDS(file.path(popdir, "WB_1960_2020_population_size_by_country_a
 hdi_orig <- readRDS(file.path(hdidir, "UNDP_2020_human_development_index.Rds")) %>%
   mutate(hdi_catg=as.character(hdi_catg))
 
+# Read zinc absorption
+zinc_orig <- readRDS("data/wessells_brown/wessells_brown_2012_zinc_absorption.Rds") %>%
+  select(iso3, estimated_fractional_absorption) %>%
+  rename(zinc_frac=estimated_fractional_absorption)
+zinc_ars_orig <- readRDS("data/wessells_brown/zinc_ars_absorption.Rds") %>%
+  rename(age_range=age,
+         zinc_frac=frac,
+         zinc_ar_mg=ar_mg)
+
 # Get ARs
 ars_orig <- nutriR::nrvs
 dris_orig <- nutriR::dris
 
 
-# Format GENUS data
+# Format GDD data
 ################################################################################
 
 # Inspect population age/sex key
@@ -59,10 +68,10 @@ sum(pop$npeople, na.rm=T) / 1e9
 n_distinct(pop$iso3)
 
 
-# Expand GENUS data
+# Expand GDD data
 ################################################################################
 
-# Which countries have population data but not GENuS data?
+# Which countries have population data but not GDD data?
 isos_gdd <- sort(unique(gdd_orig$iso3))
 isos2match <- pop_orig %>%
   select(iso3, country) %>%
@@ -99,7 +108,7 @@ gdd_add <- purrr::map_df(1:nrow(gdd_match_key), function(x){
 
 # Merge data
 gdd <- bind_rows(gdd_orig, gdd_add) %>%
-  # Add country used for GENuS data
+  # Add country used for GDD data
   left_join(gdd_match_key %>% select(iso1, iso2, country2), by=c("iso3"="iso1")) %>%
   rename(gdd_iso3=iso2, gdd_country=country2) %>%
   # Mark whether GDD borrowed or reported
@@ -235,16 +244,10 @@ data <- gdd_harmonized %>%
                             country=="New Caledonia" ~ "Medium",
                             country=="Taiwan" ~ "Very high",
                             T ~ hdi_catg)) %>%
+  # Add zinc absorpiton
+  mutate(zinc_iso3=recode(gdd_iso3, "SSD"="CAF")) %>%
+  left_join(zinc_orig, by=c("zinc_iso3"="iso3")) %>%
   # Add ARs
-  # Recode nutrient for matching to ARs
-  mutate(nutrient_ar=case_when(nutrient=="Iron" & hdi_catg=="Low" ~ "Iron (low absorption)",
-                                nutrient=="Iron" & hdi_catg=="Medium" ~ "Iron (moderate absorption)",
-                                nutrient=="Iron" & hdi_catg %in% c("High", "Very high") ~ "Iron (high absorption)",
-                                nutrient=="Zinc" & hdi_catg=="Low" ~ "Zinc (unrefined diet)",
-                                nutrient=="Zinc" & hdi_catg=="Medium" ~ "Zinc (semi-unrefined diet)",
-                                nutrient=="Zinc" & hdi_catg=="High" ~ "Zinc (semi-refined diet)",
-                                nutrient=="Zinc" & hdi_catg=="Very high" ~ "Zinc (refined diet)",
-                                T ~ nutrient)) %>%
   # Recode age range for matching to ARs
   # Requires converting factor age groups back to character age groups
   mutate(age_range=as.character(age_range)) %>%
@@ -266,17 +269,36 @@ data <- gdd_harmonized %>%
                               "70-74"=">70 y",
                               "75-79"=">70 y",
                               "80+"=">70 y")) %>%
+  # Recode nutrient for matching to ARs
+  mutate(nutrient_ar=case_when(nutrient=="Iron" & hdi_catg=="Low" ~ "Iron (low absorption)",
+                               nutrient=="Iron" & hdi_catg=="Medium" ~ "Iron (moderate absorption)",
+                               nutrient=="Iron" & hdi_catg %in% c("High", "Very high") ~ "Iron (high absorption)",
+                               # nutrient=="Zinc" & hdi_catg=="Low" ~ "Zinc (unrefined diet)",
+                               # nutrient=="Zinc" & hdi_catg=="Medium" ~ "Zinc (semi-unrefined diet)",
+                               # nutrient=="Zinc" & hdi_catg=="High" ~ "Zinc (semi-refined diet)",
+                               # nutrient=="Zinc" & hdi_catg=="Very high" ~ "Zinc (refined diet)",
+                               T ~ nutrient)) %>%
   # Fix iron and zinc age groups
   mutate(age_range_ar=ifelse(nutrient=="Zinc" & age_range %in% c("25-29", "30-34", "35-39", "40-44", "45-49"), "25-50 y", age_range_ar),
          age_range_ar=ifelse(nutrient=="Iron" & age_range %in% c("25-29", "30-34", "35-39", "40-44", "45-49"), "25-50 y", age_range_ar)) %>%
-  # Add AR
+  # Add ARs from Allen
   left_join(ars_use, by=c("nutrient_ar"="nutrient", "sex", "age_range_ar"="age_range")) %>%
+  # Add zinc ARs
+  left_join(zinc_ars_orig, by=c("sex", "age_range", "zinc_frac")) %>%
+  # Finalize Zinc ARs
+  mutate(ar_source=ifelse(nutrient=="Zinc", "EFSA", ar_source),
+         ar_units=ifelse(nutrient=="Zinc", "mg", ar_units),
+         ar=ifelse(nutrient=="Zinc", zinc_ar_mg, ar),
+         ar_cv=ifelse(nutrient=="Zinc", 0.1, ar_cv)) %>%
+  select(-zinc_ar_mg) %>%
   # Refactor age range
   mutate(age_range=factor(age_range, levels=levels(gdd_harmonized$age_range)))
 
 # Inspect
 freeR::complete(data)
 
+# Which nutrients are missing AR?
+data %>% filter(is.na(ar)) %>% pull(nutrient) %>% unique()
 
 # Build country key
 ################################################################################
@@ -294,6 +316,10 @@ cntry_key <- data %>%
 # Check number of people
 sum(cntry_key$npeople, na.rm=T) / 1e9
 sum(pop$npeople, na.rm=T) / 1e9 - sum(cntry_key$npeople, na.rm=T) / 1e9
+
+# Check
+freeR::which_duplicated(cntry_key$country)
+freeR::which_duplicated(cntry_key$iso3)
 
 # Export
 write.csv(cntry_key, file=file.path(outdir, "country_key_gdd.csv"), row.names=F)

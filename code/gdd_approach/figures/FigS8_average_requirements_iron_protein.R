@@ -24,6 +24,10 @@ pop_orig <- readRDS(file.path(popdir, "WB_1960_2020_population_size_by_country_a
 # Read country key for HDI range
 country_key <- read.csv(file.path(outdir, "country_key_gdd.csv"), as.is=T)
 
+# Read protein average
+protein_key <- readRDS(file="data/gdd/processed/GDD_total_protein_avg.Rds")
+
+
 
 # Build data
 ################################################################################
@@ -101,7 +105,7 @@ protein <- 50; sex <- "Males"; age <- "5-9"
 derive_ar_iron <- function(sex, age, protein){
 
   # protein range
-  protein_range <- c(24, 120)
+  protein_range <- range(protein_key$supply_med_cap)
   protein_min <- protein_range[1]
   protein_max <- protein_range[2]
 
@@ -128,6 +132,10 @@ derive_ar_iron <- function(sex, age, protein){
 
 }
 
+
+# Simple visualization
+################################################################################
+
 # Build protein dataframe
 protein_ars <- expand.grid(protein=seq(40, 120, 20),
                        sex=c("Males", "Females"),
@@ -138,8 +146,6 @@ protein_ars <- expand.grid(protein=seq(40, 120, 20),
   ungroup()
 
 
-# Build data
-################################################################################
 
 # Theme
 my_theme <- theme(axis.text=element_text(size=6),
@@ -177,6 +183,67 @@ g <- ggplot(data, aes(x=age, y=ar_mg, size=abs_level, group=abs_level)) +
   theme_bw() + my_theme
 g
 
+# # Export figure
+# ggsave(g, filename=file.path(plotdir, "FigS8_average_requirements_iron_protein.png"),
+#        width=6.5, height=3, units="in", dpi=600)
+
+
+# Bigger visualization
+################################################################################
+
+# Build protein dataframe
+protein_avgs <- sort(unique(protein_key$supply_med_cap))
+protein_ars <- expand.grid(protein=protein_avgs,
+                           sex=c("Males", "Females"),
+                           age=unique(agesex_key$age)) %>%
+  arrange(protein, sex, age) %>%
+  rowwise() %>%
+  mutate(ar_mg=derive_ar_iron(sex=sex, age=age, protein=protein)) %>%
+  ungroup()
+
+
+# Export
+saveRDS(protein_ars, file="data/gdd/processed/iron_ars_protein.Rds")
+
+# Theme
+my_theme <- theme(axis.text=element_text(size=6),
+                  axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+                  axis.title=element_text(size=8),
+                  legend.text=element_text(size=6),
+                  legend.title=element_text(size=8),
+                  strip.text=element_text(size=8),
+                  plot.title=element_text(size=10),
+                  # Gridlines
+                  panel.grid.major = element_blank(),
+                  panel.grid.minor = element_blank(),
+                  panel.background = element_blank(),
+                  axis.line = element_line(colour = "black"),
+                  # Legend
+                  legend.key.size = unit(0.3, "cm"),
+                  legend.background = element_rect(fill=alpha('blue', 0)))
+
+# Plot data
+g <- ggplot(data, aes(x=age, y=ar_mg, size=abs_level, group=abs_level)) +
+  facet_wrap(~sex) +
+  # Plot protein
+  geom_line(data=protein_ars, mapping=aes(x=age, y=ar_mg, color=protein, group=protein), inherit.aes = F, size=0.4) +
+  # Plot Allen ARs
+  geom_line() +
+  # Range
+  lims(y=c(0,NA)) +
+  # Labels
+  labs(x="Age range", y="Average requirement (mg)") +
+  # Legend
+  scale_size_manual(name="Absorption level\n(Allen et al. 2020)", values=seq(0.4, 1.5, length.out=3)) +
+  scale_color_gradientn(name="Protein supply (g/day)\n(Global Dietary Database)",
+                        colors = RColorBrewer::brewer.pal(9, "Spectral"),
+                        breaks=c(seq(25,100,25), 120),
+                        labels=c(seq(25,100,25), "≥120")) +
+  guides(color = guide_colorbar(ticks.colour = "black", frame.colour = "black", order=2), size=guide_legend(order=1)) +
+  # Theme
+  theme_bw() + my_theme
+g
+
 # Export figure
-ggsave(g, filename=file.path(plotdir, "FigS8_average_requirements_iron_protein.png"),
+ggsave(g, filename=file.path(plotdir, "FigS8_average_requirements_iron_protein_all.png"),
        width=6.5, height=3, units="in", dpi=600)
