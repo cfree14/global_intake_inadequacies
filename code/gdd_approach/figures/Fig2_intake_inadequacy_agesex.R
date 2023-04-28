@@ -24,7 +24,8 @@ data_orig <- readRDS(file.path(outdir, "2018_subnational_nutrient_intake_inadequ
 ################################################################################
 
 # Nutrient order
-nutrient_key <- read.csv(file=file.path(tabledir, "TableSX_global_inadequacies.csv"), as.is=T)
+nutrient_key <- read.csv(file=file.path(tabledir, "TableS1_global_inadequacies.csv"), as.is=T) %>%
+  arrange(desc(pdeficient))
 
 # Build data
 data <- data_orig %>%

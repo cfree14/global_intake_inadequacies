@@ -22,7 +22,7 @@ codedir <- "code"  # for actual app
 sapply(list.files(codedir), function(x) source(file.path(codedir, x)))
 
 # Read data
-data <- readRDS(file.path(datadir, "2011_subnational_nutrient_intake_inadequacy_estimates.Rds"))
+data <- readRDS(file.path(datadir, "2018_subnational_nutrient_intake_inadequacy_estimates.Rds"))
 
 
 # Parameters
@@ -78,6 +78,15 @@ ui <- navbarPage("Subnational nutrient intake inadequacies",
   # Explore by country
   tabPanel("Explore by country",
 
+    # Select by country
+    selectInput(inputId = "country2", label = "Select a country:",
+               choices = countries,  multiple = F, selected="Afghanistan"),
+    br(),
+
+    # Plot intakes and requirements
+    h3("Inadequacies by nutrient"),
+    plotOutput(outputId = "plot_inadequacies", width=1000, height=450),
+    br()
 
   )
 
@@ -98,6 +107,14 @@ server <- function(input, output, session){
                       base_theme = base_theme)
     g
 
+  })
+
+  # Plot intakes
+  output$plot_inadequacies <- renderPlot({
+    g <- plot_inadequacies(data = data,
+                           country = input$country2,
+                           base_theme = base_theme)
+    g
   })
 
 }

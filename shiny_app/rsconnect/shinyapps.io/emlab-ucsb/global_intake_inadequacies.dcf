@@ -1,0 +1,13 @@
+name: global_intake_inadequacies
+title: global_intake_inadequacies
+username:
+account: emlab-ucsb
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 8985040
+bundleId: 7150903
+url: https://emlab-ucsb.shinyapps.io/global_intake_inadequacies/
+when: 1682714993.97976
+lastSyncTime: 1682714993.97977
+asMultiple: FALSE
+asStatic: FALSE

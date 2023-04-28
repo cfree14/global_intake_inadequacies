@@ -12,7 +12,7 @@ plot_intakes <- function(data, nutrient, country, base_theme){
     filter(nutrient==nutrient_do & country==country_do)
 
   # Get units for y-axis
-  units <- sdata$units_short %>% unique()
+  units <- sdata$units %>% unique()
   yaxis_label <- paste0("Usual intake (", units, ")")
 
   # Plot data

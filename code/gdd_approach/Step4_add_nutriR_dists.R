@@ -136,7 +136,7 @@ data1 <- data %>%
 # Examine imputation types
 table(data1$shape_source)
 
-# Examine: only npeople, HDI, and dist_id_shape should have NAs (AR temporary as zinc/iron missing)
+# Examine: only npeople, HDI, and dist_id_shape should have NAs
 freeR::complete(data1)
 
 

@@ -114,6 +114,7 @@ g <- ggplot() +
   geom_point(data=data_pts, mapping=aes(x=long_dd, y=lat_dd, fill=pdeficient), pch=21, size=0.9, inherit.aes = F, stroke=0.2) +
   # Add label
   geom_text(data=stat_labels, mapping=aes(x=-180, y=-42, label=label), size=1.4, hjust=0, nudge_x=-0.5, inherit.aes=F) +
+  # geom_text(data=stat_labels, mapping=aes(x=-90, y=-60, label=label), size=1.4, hjust=0.5, nudge_x=-0.5, inherit.aes=F) +
   # Legend
   scale_fill_gradientn(name="% inadequate",
                        labels=scales::percent, lim=c(0,1),

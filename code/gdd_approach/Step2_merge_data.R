@@ -28,18 +28,26 @@ pop_orig <- readRDS(file.path(popdir, "WB_1960_2020_population_size_by_country_a
 hdi_orig <- readRDS(file.path(hdidir, "UNDP_2020_human_development_index.Rds")) %>%
   mutate(hdi_catg=as.character(hdi_catg))
 
-# Read zinc absorption
-zinc_orig <- readRDS("data/wessells_brown/wessells_brown_2012_zinc_absorption.Rds") %>%
-  select(iso3, estimated_fractional_absorption) %>%
-  rename(zinc_frac=estimated_fractional_absorption)
-zinc_ars_orig <- readRDS("data/wessells_brown/zinc_ars_absorption.Rds") %>%
-  rename(age_range=age,
-         zinc_frac=frac,
-         zinc_ar_mg=ar_mg)
-
 # Get ARs
 ars_orig <- nutriR::nrvs
 dris_orig <- nutriR::dris
+
+# Get zinc AR info
+zinc_key <- readRDS("data/wessells_brown/wessells_brown_2012_zinc_absorption.Rds") %>%
+  select(iso3, phytate_mg)
+zinc_ars <- readRDS("data/wessells_brown/zinc_ars_phytate.Rds") %>%
+  rename(age_range=age,
+         phytate_mg=phytate,
+         zinc_ar_mg=ar_mg)
+
+# Get iron AR info
+iron_key <- readRDS("data/gdd/processed/GDD_total_protein_avg.Rds") %>%
+  select(iso3, supply_med_cap) %>%
+  rename(protein_g=supply_med_cap)
+iron_ars <- readRDS("data/gdd/processed/iron_ars_protein.Rds") %>%
+  rename(age_range=age,
+         protein_g=protein,
+         iron_ar_mg=ar_mg)
 
 
 # Format GDD data
@@ -244,9 +252,11 @@ data <- gdd_harmonized %>%
                             country=="New Caledonia" ~ "Medium",
                             country=="Taiwan" ~ "Very high",
                             T ~ hdi_catg)) %>%
-  # Add zinc absorpiton
+  # Add zinc phytate (for deriving zinc ARs)
   mutate(zinc_iso3=recode(gdd_iso3, "SSD"="CAF")) %>%
-  left_join(zinc_orig, by=c("zinc_iso3"="iso3")) %>%
+  left_join(zinc_key, by=c("zinc_iso3"="iso3")) %>%
+  # Add protein intake (for deriving iron ARs)
+  left_join(iron_key, by=c("gdd_iso3"="iso3")) %>%
   # Add ARs
   # Recode age range for matching to ARs
   # Requires converting factor age groups back to character age groups
@@ -269,28 +279,27 @@ data <- gdd_harmonized %>%
                               "70-74"=">70 y",
                               "75-79"=">70 y",
                               "80+"=">70 y")) %>%
-  # Recode nutrient for matching to ARs
-  mutate(nutrient_ar=case_when(nutrient=="Iron" & hdi_catg=="Low" ~ "Iron (low absorption)",
-                               nutrient=="Iron" & hdi_catg=="Medium" ~ "Iron (moderate absorption)",
-                               nutrient=="Iron" & hdi_catg %in% c("High", "Very high") ~ "Iron (high absorption)",
-                               # nutrient=="Zinc" & hdi_catg=="Low" ~ "Zinc (unrefined diet)",
-                               # nutrient=="Zinc" & hdi_catg=="Medium" ~ "Zinc (semi-unrefined diet)",
-                               # nutrient=="Zinc" & hdi_catg=="High" ~ "Zinc (semi-refined diet)",
-                               # nutrient=="Zinc" & hdi_catg=="Very high" ~ "Zinc (refined diet)",
-                               T ~ nutrient)) %>%
   # Fix iron and zinc age groups
   mutate(age_range_ar=ifelse(nutrient=="Zinc" & age_range %in% c("25-29", "30-34", "35-39", "40-44", "45-49"), "25-50 y", age_range_ar),
          age_range_ar=ifelse(nutrient=="Iron" & age_range %in% c("25-29", "30-34", "35-39", "40-44", "45-49"), "25-50 y", age_range_ar)) %>%
   # Add ARs from Allen
-  left_join(ars_use, by=c("nutrient_ar"="nutrient", "sex", "age_range_ar"="age_range")) %>%
+  left_join(ars_use, by=c("nutrient", "sex", "age_range_ar"="age_range")) %>%
   # Add zinc ARs
-  left_join(zinc_ars_orig, by=c("sex", "age_range", "zinc_frac")) %>%
-  # Finalize Zinc ARs
+  left_join(zinc_ars, by=c("sex", "age_range", "phytate_mg")) %>%
+  # Finalize zinc ARs
   mutate(ar_source=ifelse(nutrient=="Zinc", "EFSA", ar_source),
          ar_units=ifelse(nutrient=="Zinc", "mg", ar_units),
          ar=ifelse(nutrient=="Zinc", zinc_ar_mg, ar),
          ar_cv=ifelse(nutrient=="Zinc", 0.1, ar_cv)) %>%
   select(-zinc_ar_mg) %>%
+  # Add iron ARs
+  left_join(iron_ars, by=c("sex", "age_range", "protein_g")) %>%
+  # Finalize iron ARs
+  mutate(ar_source=ifelse(nutrient=="Iron", "EFSA", ar_source),
+         ar_units=ifelse(nutrient=="Iron", "mg", ar_units),
+         ar=ifelse(nutrient=="Iron", iron_ar_mg, ar),
+         ar_cv=ifelse(nutrient=="Iron", 0.1, ar_cv)) %>%
+  select(-iron_ar_mg) %>%
   # Refactor age range
   mutate(age_range=factor(age_range, levels=levels(gdd_harmonized$age_range)))
 
@@ -300,6 +309,7 @@ freeR::complete(data)
 # Which nutrients are missing AR?
 data %>% filter(is.na(ar)) %>% pull(nutrient) %>% unique()
 
+
 # Build country key
 ################################################################################
 
@@ -308,7 +318,7 @@ cntry_key <- data %>%
   # Reduce to single nutrient (so population doesn't get double counted)
   filter(nutrient=="Calcium") %>%
   # Summarize
-  group_by(continent, country, iso3, hdi, hdi_catg) %>%
+  group_by(continent, country, iso3, protein_g, phytate_mg) %>% # hdi, hdi_catg
   summarize(npeople=sum(npeople),
             gdd_yn=unique(gdd_type)) %>%
   ungroup()
@@ -342,11 +352,11 @@ data %>%
 
 # Check AR coverage
 ar_coverage <- data %>%
-  select(nutrient_ar, sex, age_range, ar) %>%
+  select(nutrient, sex, age_range, ar) %>%
   unique()
 
 # Plot AR coverage check
-ggplot(ar_coverage, aes(x=age_range, y=nutrient_ar, fill=ar)) +
+ggplot(ar_coverage, aes(x=age_range, y=nutrient, fill=ar)) +
   facet_wrap(~sex) +
   geom_tile() +
   labs(x="Age range (yr)", y="") +
@@ -355,7 +365,7 @@ ggplot(ar_coverage, aes(x=age_range, y=nutrient_ar, fill=ar)) +
 
 # Check AR units
 unit_key <- data %>%
-  select(nutrient, nutrient_ar, units, ar_units) %>%
+  select(nutrient, units, ar_units) %>%
   unique()
 unit_key_check <- unit_key %>%
   filter(!is.na(ar_units) & ar_units!=units)
