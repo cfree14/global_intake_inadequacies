@@ -1,8 +1,8 @@
-# Estimating nutrient intake inadequacies globally
+# Estimating global nutrient intake adequacy
 
 This GitHub repository contains the data and code for the following paper in preparation:
 
-* Passarelli S, Free CM,  Shepon A, Beal T, Batis C, Golden CD. Global estimates of national and subnational nutrient intake inadequacies. Near submission to _The Lancet_.
+* Passarelli S, Free CM,  Shepon A, Beal T, Batis C, Golden CD. Estimating global nutrient intake adequacy. Near submission to _The Lancet_.
 
 ## R Shiny web application
 
