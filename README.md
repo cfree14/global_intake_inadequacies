@@ -4,11 +4,11 @@ This GitHub repository contains the data and code for the following paper in pre
 
 * Passarelli S, Free CM,  Shepon A, Beal T, Batis C, Golden CD. Global estimates of national and subnational nutrient intake inadequacies. Near submission to _The Lancet_.
 
-Please contact Chris Free (cfree14@gmail.com) with any questions.
+Please contact Chris Free (cfree14@gmail.com) with any questions about the repository and Simone Passarelli (simoneapassarelli@gmail.com) with any questions about the paper.
 
 # R Shiny web application
 
-A R Shiny web application to explore global nutrient intake inadequacies is available here: https://emlab-ucsb.shinyapps.io/global_intake_inaqequacies/
+An R Shiny web application to explore global nutrient intake inadequacies is available here: https://emlab-ucsb.shinyapps.io/global_intake_inaqequacies/
 
 # Repository structure
 
