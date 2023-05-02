@@ -71,8 +71,6 @@ ui <- navbarPage("Subnational nutrient intake inadequacies",
     plotOutput(outputId = "plot_intakes", width=800, height=450),
     br()
 
-
-
   ),
 
   # Explore by country
@@ -83,9 +81,14 @@ ui <- navbarPage("Subnational nutrient intake inadequacies",
                choices = countries,  multiple = F, selected="Afghanistan"),
     br(),
 
-    # Plot intakes and requirements
+    # Plot inadequacies
     h3("Inadequacies by nutrient"),
     plotOutput(outputId = "plot_inadequacies", width=1000, height=450),
+    br(),
+
+    # Plot intakes and requirements
+    h3("Subnational intakes, requirements, and inadequacies"),
+    plotOutput(outputId = "plot_intakes_country", width=800, height=4000),
     br()
 
   )
@@ -106,14 +109,21 @@ server <- function(input, output, session){
                       country = input$country,
                       base_theme = base_theme)
     g
-
   })
 
-  # Plot intakes
+  # Plot inadequacies - country
   output$plot_inadequacies <- renderPlot({
     g <- plot_inadequacies(data = data,
                            country = input$country2,
                            base_theme = base_theme)
+    g
+  })
+
+  # Plot intakes - country
+  output$plot_intakes_country <- renderPlot({
+    g <- plot_intakes_country(data = data,
+                              country = input$country2,
+                              base_theme = base_theme)
     g
   })
 

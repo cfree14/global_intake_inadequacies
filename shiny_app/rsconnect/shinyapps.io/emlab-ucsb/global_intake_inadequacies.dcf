@@ -5,10 +5,10 @@ account: emlab-ucsb
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 8985040
-bundleId: 7161239
+bundleId: 7164752
 url: https://emlab-ucsb.shinyapps.io/global_intake_inadequacies/
-when: 1682980538.9061
-lastSyncTime: 1682980538.90611
+when: 1683046475.19936
+lastSyncTime: 1683046475.19937
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: data/2011_subnational_nutrient_intake_inadequacy_estimates.Rds

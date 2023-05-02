@@ -24,7 +24,7 @@ plot_inadequacies <- function(data, country, base_theme){
     facet_wrap(~sex) +
     geom_raster() +
     # Labels
-    labs(x="Age range", y="", title=country_do) +
+    labs(x="Age range", y="") +
     # Legend
     scale_fill_gradientn(name="% inadequate", lim=c(0,100), colors=RColorBrewer::brewer.pal(9, "Spectral") %>% rev()) +
     guides(fill = guide_colorbar(ticks.colour = "black", frame.colour = "black")) +
