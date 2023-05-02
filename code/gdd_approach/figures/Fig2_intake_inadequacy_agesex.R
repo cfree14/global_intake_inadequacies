@@ -45,11 +45,30 @@ data <- data_orig %>%
   summarize(npeople=sum(npeople, na.rm=T),
            ndeficient=sum(ndeficient, na.rm=T)) %>%
   mutate(pdeficient=ndeficient/npeople) %>%
-  ungroup()
+  ungroup() %>%
+  # Add short region
+  mutate(region_short=recode(region,
+                             "Australia / New Zealand"="NZ/Australia",
+                             "Central Asia"="C Asia",
+                             "Eastern Asia"="E Asia",
+                             "Eastern Europe"="E Europe",
+                             "Latin America / Caribbean"="Lat. America",
+                             # "Melanesia"="",
+                             # "Micronesia"="",
+                             "Northern Africa"="N Africa",
+                             "Northern America"="N America",
+                             "Northern Europe"="N Europe",
+                             # "Polynesia"="",
+                             "South-eastern Asia"="SE Asia",
+                             "Southern Asia"="S Asia",
+                             "Southern Europe"="S Europe",
+                             "Sub-Saharan Africa"="SS Africa",
+                             "Western Asia"="W Asia",
+                             "Western Europe"="W Europe"))
 
 # Region order
 region_order <- data %>%
-  group_by(region) %>%
+  group_by(region_short) %>%
   summarize(pdeficient=median(pdeficient)) %>%
   arrange(pdeficient)
 
@@ -58,7 +77,7 @@ data_ordered <- data %>%
   # Order nutrient
   mutate(nutrient=factor(nutrient, levels=nutrient_key$nutrient)) %>%
   # Order region
-  mutate(region=factor(region, levels=region_order$region))
+  mutate(region_short=factor(region_short, levels=region_order$region_short))
 
 # Break into two
 nutrients <- nutrient_key$nutrient
@@ -88,7 +107,7 @@ my_theme <- theme(axis.text=element_text(size=5),
                   legend.background = element_rect(fill=alpha('blue', 0)))
 
 # Plot
-g1 <- ggplot(data1, aes(x=age_range, y=region, fill=pdeficient)) +
+g1 <- ggplot(data1, aes(x=age_range, y=region_short, fill=pdeficient)) +
   facet_grid(nutrient~sex) +
   geom_tile() +
   # Labels
@@ -105,7 +124,7 @@ g1 <- ggplot(data1, aes(x=age_range, y=region, fill=pdeficient)) +
 g1
 
 # Plot
-g2 <- ggplot(data2, aes(x=age_range, y=region, fill=pdeficient)) +
+g2 <- ggplot(data2, aes(x=age_range, y=region_short, fill=pdeficient)) +
   facet_grid(nutrient~sex) +
   geom_tile() +
   # Labels
@@ -119,7 +138,7 @@ g2 <- ggplot(data2, aes(x=age_range, y=region, fill=pdeficient)) +
                                title.position = "top", title.hjust = 0.5)) +
   # Theme
   theme_bw() + my_theme +
-  theme(axis.text.y=element_blank(),
+  theme(#axis.text.y=element_blank(),
         legend.position = "top")
 g2
 
@@ -129,5 +148,5 @@ g
 
 # Export
 ggsave(g, filename=file.path(plotdir, "Fig2_intake_inadequacy_agesex.png"),
-       width=6.5, height=7.25, units="in", dpi=600)
+       width=6.5, height=7.5, units="in", dpi=600)
 

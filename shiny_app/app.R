@@ -87,6 +87,11 @@ ui <- navbarPage("Subnational nutrient intake inadequacies",
     br(),
 
     # Plot intakes and requirements
+    h3("Difference in inadequacies between sexes"),
+    plotOutput(outputId = "plot_sex_diff", width=600, height=400),
+    br(),
+
+    # Plot intakes and requirements
     h3("Subnational intakes, requirements, and inadequacies"),
     plotOutput(outputId = "plot_intakes_country", width=800, height=4000),
     br()
@@ -116,6 +121,14 @@ server <- function(input, output, session){
     g <- plot_inadequacies(data = data,
                            country = input$country2,
                            base_theme = base_theme)
+    g
+  })
+
+  # Plot inadequacies sex diff - country
+  output$plot_sex_diff <- renderPlot({
+    g <- plot_sex_diff(data = data,
+                       country = input$country2,
+                       base_theme = base_theme)
     g
   })
 
