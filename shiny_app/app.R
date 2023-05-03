@@ -108,7 +108,8 @@ ui <- navbarPage("Subnational nutrient intake inadequacies",
     h3("References"),
     p("1. Allen LH, Carriquiry AL, Murphy SP (2020) Perspective: Proposed harmonized nutrient reference values for populations. Advances in Nutrition 11: 469–83."),
     p("2. Global Dietary Database (2022) The GDD Prediction Model. Available at: https://www.globaldietarydatabase.org/gdd-prediction-model"),
-    p("3. Passarelli S, Free CM, Allen LH, Batis C, Beal T, Biltoft-Jensen AP, Bromage S, Cao L, Castellanos-Guitiérrez A, Christensen T, Crispim SP, Dekkers A, De Ridder K, Kronsteiner-Gicevic S, Lee C, Li Y, Moursi M, Moyersoen I, Schmidhuber J,  Shepon A, Viana DF, Golden CD (2022) Estimating national and subnational nutrient intake distributions of global diets. The American Journal of Clinical Nutrition 116(2): 551-560.")
+    p("3. Passarelli S, Free CM, Allen LH, Batis C, Beal T, Biltoft-Jensen AP, Bromage S, Cao L, Castellanos-Guitiérrez A, Christensen T, Crispim SP, Dekkers A, De Ridder K, Kronsteiner-Gicevic S, Lee C, Li Y, Moursi M, Moyersoen I, Schmidhuber J,  Shepon A, Viana DF, Golden CD (2022) Estimating national and subnational nutrient intake distributions of global diets. The American Journal of Clinical Nutrition 116(2): 551-560."),
+    p("4. Passarelli S, Free CM,  Shepon A, Beal T, Batis C, Golden CD. Global estimates of national and subnational nutrient intake inadequacies. Near submission to The Lancet.")
 
   )
 
