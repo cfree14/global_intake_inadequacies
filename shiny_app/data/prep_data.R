@@ -2,6 +2,18 @@
 # Directories
 datadir <- "output"
 datadir_shiny <- "shiny_app/data"
+gisdir <- "data/world/processed"
+
+# Read world data
+world_lg <- readRDS(file=file.path(gisdir, "world_large.Rds"))
+world_sm <- readRDS(file=file.path(gisdir, "world_small.Rds")) %>% sf::st_as_sf()
+world_centers <- readRDS(file=file.path(gisdir, "world_centroids.Rds"))
+
+# Save world data
+saveRDS(world_lg, file.path(datadir_shiny, "world_large.Rds"))
+saveRDS(world_sm, file.path(datadir_shiny, "world_small.Rds"))
+saveRDS(world_centers, file.path(datadir_shiny, "world_centroids.Rds"))
+
 
 # Read data
 data_orig <- readRDS(file.path(datadir, "2018_subnational_nutrient_intake_inadequacy_estimates_full.Rds"))

@@ -27,9 +27,9 @@ plot_intakes_country <- function(data, country, base_theme){
     # Plot point
     geom_point(data=sdata, mapping=aes(x=age_range, y=supply50, fill=sev/100), size=5, pch=21) +
     # Reference
-    geom_line(data=sdata, mapping=aes(x=age_range, y=ar, group=sex), inherit.aes = F) +
+    geom_line(data=sdata, mapping=aes(x=age_range, y=ar, group=sex), inherit.aes = F, linewidth=1.3) +
     # Labels
-    labs(x="Age range (yr)", y="Usual intake", title=country_do) +
+    labs(x="Age range (yr)", y="Usual intake") +
     lims(y=c(0, NA)) +
     # Legend
     scale_color_gradientn(name="% inadequate", colors=RColorBrewer::brewer.pal(9, "Spectral") %>% rev(),

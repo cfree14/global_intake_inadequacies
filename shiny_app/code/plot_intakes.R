@@ -24,9 +24,9 @@ plot_intakes <- function(data, nutrient, country, base_theme){
     # Plot point
     geom_point(data=sdata, mapping=aes(x=age_range, y=supply50, fill=sev/100), size=5, pch=21) +
     # Reference
-    geom_line(data=sdata, mapping=aes(x=age_range, y=ar, group=sex), inherit.aes = F) +
+    geom_line(data=sdata, mapping=aes(x=age_range, y=ar, group=sex), inherit.aes = F, linewidth=1.3) +
     # Labels
-    labs(x="Age range (yr)", y=yaxis_label) +
+    labs(x="Age range (yr)", y=yaxis_label, title=country_do) +
     # Limits
     lims(y=c(0, NA)) +
     # Legend

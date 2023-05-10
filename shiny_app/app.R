@@ -24,6 +24,12 @@ sapply(list.files(codedir), function(x) source(file.path(codedir, x)))
 # Read data
 data <- readRDS(file.path(datadir, "2018_subnational_nutrient_intake_inadequacy_estimates.Rds"))
 
+# Read world data
+world_lg <- readRDS(file=file.path(datadir, "world_large.Rds"))
+world_sm <- readRDS(file=file.path(datadir, "world_small.Rds"))
+world_centers <- readRDS(file=file.path(datadir, "world_centroids.Rds"))
+
+
 
 # Parameters
 ################################################################################
@@ -59,6 +65,10 @@ ui <- navbarPage("Subnational nutrient intake inadequacies",
     # Select by nutrient
     selectInput(inputId = "nutrient", label = "Select a nutrient:",
                choices = nutrients,  multiple = F, selected="Calcium"),
+    br(),
+
+    # Inadequacies map
+    plotOutput(outputId = "plot_inadequacies_map", width=800, height=250),
     br(),
 
     # Select by country
@@ -121,6 +131,14 @@ ui <- navbarPage("Subnational nutrient intake inadequacies",
 
 # Server
 server <- function(input, output, session){
+
+  # Plot inadequacies - map
+  output$plot_inadequacies_map <- renderPlot({
+    g <- plot_inadequacies_map(data = data,
+                               nutrient = input$nutrient,
+                               base_theme = base_theme)
+    g
+  })
 
   # Plot intakes
   output$plot_intakes <- renderPlot({
