@@ -1,7 +1,7 @@
 
 # Plot coverage
 # data <- data; nutrient <- "Calcium"
-plot_inadequacies_map <- function(data, nutrient, base_theme){
+plot_inadequacies_map <- function(data, world_sm, world_centers, nutrient, base_theme){
 
   # Build data
   nutrient_do <- nutrient
@@ -19,7 +19,6 @@ plot_inadequacies_map <- function(data, nutrient, base_theme){
   data_sf <- world_sm %>%
       select(-country) %>%
       left_join(sdata, by="iso3")
-
 
   # Create points for small countries
   data_pts <-world_centers %>%

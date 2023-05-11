@@ -26,7 +26,7 @@ data <- readRDS(file.path(datadir, "2018_subnational_nutrient_intake_inadequacy_
 
 # Read world data
 world_lg <- readRDS(file=file.path(datadir, "world_large.Rds"))
-world_sm <- readRDS(file=file.path(datadir, "world_small.Rds"))
+world_sm <- readRDS(file=file.path(datadir, "world_small.Rds")) %>% sf::st_as_sf()
 world_centers <- readRDS(file=file.path(datadir, "world_centroids.Rds"))
 
 
@@ -135,6 +135,8 @@ server <- function(input, output, session){
   # Plot inadequacies - map
   output$plot_inadequacies_map <- renderPlot({
     g <- plot_inadequacies_map(data = data,
+                               world_sm = world_sm,
+                               world_centers = world_centers,
                                nutrient = input$nutrient,
                                base_theme = base_theme)
     g
