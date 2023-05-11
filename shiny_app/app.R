@@ -94,14 +94,8 @@ ui <- navbarPage("Subnational nutrient intake inadequacies",
 
     # Plot inadequacies
     h3("Inadequacies by nutrient"),
-    p("The figure below shows the prevalence of inadequate intakes by age-sex group for the selected country. Micronutrients are ordered from fewest intake inadequacies (top) to most intake intake inadequacies (bottom)."),
-    plotOutput(outputId = "plot_inadequacies", width=1000, height=450),
-    br(),
-
-    # Plot intakes and requirements
-    h3("Difference in inadequacies between sexes"),
-    p("The figure below shows the difference in the prevalence of inadequate intakes between males and females in the same age group. Blue colors indicate age groups in which males have more intake inadequacies than females and red colors initiate age groups in which females have more intake inadequacies than males."),
-    plotOutput(outputId = "plot_sex_diff", width=600, height=400),
+    p("Panel A in the figure below shows the prevalence of inadequate intakes by age-sex group for the selected country. Micronutrients are ordered from fewest intake inadequacies (top) to most intake intake inadequacies (bottom). Panel B shows the difference in the prevalence of inadequate intakes between males and females in the same age group. Blue colors indicate age groups in which males have more intake inadequacies than females and red colors initiate age groups in which females have more intake inadequacies than males."),
+    plotOutput(outputId = "plot_inadequacies_v2", width=1000, height=450),
     br(),
 
     # Plot intakes and requirements
@@ -152,8 +146,8 @@ server <- function(input, output, session){
   })
 
   # Plot inadequacies - country
-  output$plot_inadequacies <- renderPlot({
-    g <- plot_inadequacies(data = data,
+  output$plot_inadequacies_v2 <- renderPlot({
+    g <- plot_inadequacies_v2(data = data,
                            country = input$country2,
                            base_theme = base_theme)
     g
