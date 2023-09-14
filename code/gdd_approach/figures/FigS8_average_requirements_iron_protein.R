@@ -97,7 +97,7 @@ data <- agesex_key %>%
 
 
 
-# Derive AR based on HDI
+# Derive AR based on protein
 ################################################################################
 
 # Function to derive AR based on protein
