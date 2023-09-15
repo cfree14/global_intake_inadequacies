@@ -7,11 +7,11 @@
 rm(list = ls())
 
 # Packages
-library(tidyverse)
 library(countrycode)
-library(ggbiplot)
+library(ggbiplot) # devtools::install_github("vqv/ggbiplot")
 library(vegan)
 library(factoextra)
+library(tidyverse)
 
 # Directories
 datadir <- "data"
@@ -46,7 +46,7 @@ gdd <- gdd_orig %>%
   filter(sex=="Both sexes" & residence=="All residences" & education=="All education levels") %>%
   # Average national intake
   group_by(iso3, country, factor) %>%
-  summarize(supply_avg=mean(supply_med, )) %>%
+  summarize(supply_avg=mean(supply_med)) %>%
   ungroup() %>%
   # Spread
   spread(key="factor", value="supply_avg") %>%

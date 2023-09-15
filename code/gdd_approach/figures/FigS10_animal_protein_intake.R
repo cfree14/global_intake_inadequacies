@@ -46,30 +46,23 @@ animal_proteins <- c("Eggs", "Total processed meats", "Unprocessed red meats", "
 # Build data
 sdata <- data %>%
   # Reduce to animal protein intakes averaged across all categories
-  filter(factor %in% animal_proteins & residence=="All residences" & education=="All education levels" & sex!="Both sexes" & age_range!="All ages") %>%
+  filter(factor %in% animal_proteins & residence=="All residences" & education=="All education levels" & sex=="Both sexes" & age_range=="All ages") %>%
   # Summarize
-  group_by(region, iso3, country, sex, age_range) %>%
+  group_by(region, iso3, country) %>%
   summarize(supply_med=sum(supply_med, na.rm=T),
-            supply_med_cap=pmin(supply_med, 400))
+            supply_med_cap=pmin(supply_med, 250))
 
-# Plot by sex
-ggplot(sdata, aes(x=supply_med, fill=sex)) +
+# Plot supply distribution
+ggplot(sdata, aes(x=supply_med)) +
   geom_density() +
   # Labels
-  labs(x="Total protein supply (g)") +
+  labs(x="Animal foods supply (g)") +
   # Theme
   theme_bw()
 
-# Plot age
-ggplot(sdata, aes(x=supply_med, fill=age_range)) +
-  geom_density() +
-  # Labels
-  labs(x="Total protein supply (g)") +
-  # Theme
-  theme_bw()
 
 # Export data
-saveRDS(sdata, file=file.path(datadir, "GDD_animal_protein_avg.Rds"))
+saveRDS(sdata, file=file.path(datadir, "GDD_animal_foods_avg.Rds"))
 
 
 # Visualize data
@@ -103,11 +96,11 @@ my_theme <-  theme(axis.text=element_text(size=6),
 g1 <- ggplot(sdata, aes(x=supply_med)) +
   geom_density() +
   # Reference line
-  geom_vline(xintercept = c(400), linetype="dotted") +
+  geom_vline(xintercept = c(250), linetype="dotted") +
   # Labels
   labs(x="ASF supply (g/day)", y="Density", tag="A") +
   # Axes
-  scale_x_continuous(breaks=seq(0,600,100), lim=c(0, 600)) +
+  scale_x_continuous(breaks=seq(0,600,100)) +
   # Theme
   theme_bw() + my_theme
 g1
@@ -120,8 +113,8 @@ g2 <- ggplot(world_sm, aes(fill=supply_med_cap)) +
   # Labels
   labs(x="", y="", tag="B") +
   # Legend
-  scale_fill_gradientn(name="ASF supply (g/day)", colors=RColorBrewer::brewer.pal(9, "Spectral") %>% rev(), na.value="grey80",
-                       breaks=seq(0, 400, 100), labels=c(seq(0, 300, 100), "≥400")) +
+  scale_fill_gradientn(name="ASF supply (g/day)", colors=RColorBrewer::brewer.pal(9, "Spectral") %>% rev(), na.value="grey80",#) +
+                       breaks=seq(0, 250, 50), labels=c(seq(0, 200, 50), "≥250")) +
   guides(fill = guide_colorbar(ticks.colour = "black", frame.colour = "black", title.position="top")) +
   # Crop
   coord_sf(ylim=c(-52, 80), expand = T) +
@@ -137,7 +130,7 @@ g <- gridExtra::grid.arrange(g1, g2, nrow=1, widths=c(0.25, 0.75))
 g
 
 # Export
-ggsave(g, filename=file.path(plotdir, "FigS10_gdd_animal_protein.png"),
+ggsave(g, filename=file.path(plotdir, "FigS10_gdd_animal_foods.png"),
        width=6.5, height=2.25, units="in", dpi=600)
 
 

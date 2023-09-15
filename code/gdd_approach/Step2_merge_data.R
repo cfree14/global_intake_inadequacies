@@ -41,10 +41,22 @@ zinc_ars <- readRDS("data/wessells_brown/zinc_ars_phytate.Rds") %>%
          zinc_ar_mg=ar_mg)
 
 # Get iron AR info
-iron_key <- readRDS("data/gdd/processed/GDD_total_protein_avg.Rds") %>%
+# Use this code block to revert back to total protein-based ARs
+# iron_key <- readRDS("data/gdd/processed/GDD_total_protein_avg.Rds") %>%
+#   select(iso3, supply_med_cap) %>%
+#   rename(protein_g=supply_med_cap)
+# iron_ars <- readRDS("data/gdd/processed/iron_ars_protein.Rds") %>%
+#   rename(age_range=age,
+#          protein_g=protein,
+#          iron_ar_mg=ar_mg)
+
+# Get iron AR info
+# Use this code block for the ASF-based ARs
+iron_key <- readRDS("data/gdd/processed/GDD_animal_foods_avg.Rds") %>%
+  ungroup() %>%
   select(iso3, supply_med_cap) %>%
   rename(protein_g=supply_med_cap)
-iron_ars <- readRDS("data/gdd/processed/iron_ars_protein.Rds") %>%
+iron_ars <- readRDS("data/gdd/processed/iron_ars_animal_foods.Rds") %>%
   rename(age_range=age,
          protein_g=protein,
          iron_ar_mg=ar_mg)
