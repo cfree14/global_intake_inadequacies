@@ -177,7 +177,7 @@ g <- ggplot(data, aes(x=age, y=ar_mg, size=abs_level, group=abs_level)) +
   # Legend
   scale_size_manual(name="Absorption level", values=seq(0.4, 1.5, length.out=3)) +
   scale_linetype_manual(name="AR type", values=c("dotted", "solid")) +
-  scale_color_gradientn(name="ASF supply (g)", colors = RColorBrewer::brewer.pal(9, "Reds")[4:9]) +
+  scale_color_gradientn(name="ASF intake (g)", colors = RColorBrewer::brewer.pal(9, "Reds")[4:9]) +
   guides(color = guide_colorbar(ticks.colour = "black", frame.colour = "black")) +
   # Theme
   theme_bw() + my_theme
@@ -235,7 +235,7 @@ g <- ggplot(data, aes(x=age, y=ar_mg, size=abs_level, group=abs_level)) +
   labs(x="Age range", y="Average requirement (mg)") +
   # Legend
   scale_size_manual(name="Absorption level\n(Allen et al. 2020)", values=seq(0.4, 1.5, length.out=3)) +
-  scale_color_gradientn(name="ASF supply (g/day)\n(Global Dietary Database)",
+  scale_color_gradientn(name="ASF intake (g/day)\n(Global Dietary Database)",
                         colors = RColorBrewer::brewer.pal(9, "Spectral"),
                         breaks=seq(0, 250, 50),
                         labels=c(seq(0, 200, 50), "≥250")) +

@@ -56,7 +56,7 @@ sdata <- data %>%
 ggplot(sdata, aes(x=supply_med)) +
   geom_density() +
   # Labels
-  labs(x="Animal foods supply (g)") +
+  labs(x="Animal foods intake (g)") +
   # Theme
   theme_bw()
 
@@ -113,7 +113,7 @@ g2 <- ggplot(world_sm, aes(fill=supply_med_cap)) +
   # Labels
   labs(x="", y="", tag="B") +
   # Legend
-  scale_fill_gradientn(name="ASF supply (g/day)", colors=RColorBrewer::brewer.pal(9, "Spectral") %>% rev(), na.value="grey80",#) +
+  scale_fill_gradientn(name="ASF intake (g/day)", colors=RColorBrewer::brewer.pal(9, "Spectral") %>% rev(), na.value="grey80",#) +
                        breaks=seq(0, 250, 50), labels=c(seq(0, 200, 50), "≥250")) +
   guides(fill = guide_colorbar(ticks.colour = "black", frame.colour = "black", title.position="top")) +
   # Crop
