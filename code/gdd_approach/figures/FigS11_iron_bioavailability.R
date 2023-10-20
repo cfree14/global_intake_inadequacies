@@ -11,6 +11,7 @@ library(tidyverse)
 library(countrycode)
 
 # Directories
+outdir <- "data/gdd/processed"
 plotdir <- "figures/gdd_approach"
 tabledir <- "tables"
 gisdir <- "data/world/processed"
@@ -45,6 +46,9 @@ data <- phytate_orig %>%
          mean_q=(phytate_q+asf_q)/2,
          bioavailability=scales::rescale(mean_q, to=c(5,16)),
          bioavailability_cap=pmin(bioavailability, 12))
+
+# Export data
+saveRDS(data, file=file.path(outdir, "iron_bioavailability.Rds"))
 
 
 
