@@ -203,7 +203,7 @@ iron_abs_ars <- expand.grid(iron_abs=iron_abs_avgs,
   ungroup()
 
 # Export
-saveRDS(protein_ars, file="data/gdd/processed/iron_ars_bioavailability.Rds")
+saveRDS(iron_abs_ars, file="data/gdd/processed/iron_ars_bioavailability.Rds")
 
 
 # Theme

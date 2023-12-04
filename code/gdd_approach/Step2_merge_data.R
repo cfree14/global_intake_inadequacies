@@ -61,6 +61,16 @@ iron_ars <- readRDS("data/gdd/processed/iron_ars_animal_foods.Rds") %>%
          protein_g=protein,
          iron_ar_mg=ar_mg)
 
+# Get iron AR info
+# Use this code block for the bioavailability based ARs
+# iron_key <- readRDS("data/gdd/processed/iron_bioavailability.Rds") %>%
+#   ungroup() %>%
+#   select(iso3, bioavailability) %>%
+#   rename(iron_abs=bioavailability)
+# iron_ars <- readRDS("data/gdd/processed/iron_ars_bioavailability.Rds") %>%
+#   rename(age_range=age,
+#          iron_ar_mg=ar_mg)
+
 
 # Format GDD data
 ################################################################################
@@ -265,7 +275,7 @@ data <- gdd_harmonized %>%
                             country=="Taiwan" ~ "Very high",
                             T ~ hdi_catg)) %>%
   # Add zinc phytate (for deriving zinc ARs)
-  mutate(zinc_iso3=recode(gdd_iso3, "SSD"="CAF")) %>%
+  mutate(zinc_iso3=recode(gdd_iso3, "SSD"="CAF")) %>% # South Sudan phytate from Central African Republic
   left_join(zinc_key, by=c("zinc_iso3"="iso3")) %>%
   # Add protein intake (for deriving iron ARs)
   left_join(iron_key, by=c("gdd_iso3"="iso3")) %>%
@@ -305,7 +315,8 @@ data <- gdd_harmonized %>%
          ar_cv=ifelse(nutrient=="Zinc", 0.1, ar_cv)) %>%
   select(-zinc_ar_mg) %>%
   # Add iron ARs
-  left_join(iron_ars, by=c("sex", "age_range", "protein_g")) %>%
+  left_join(iron_ars, by=c("sex", "age_range", "protein_g")) %>% # for protein version
+  # left_join(iron_ars, by=c("sex", "age_range", "iron_abs")) %>% # for bioavailabililty version
   # Finalize iron ARs
   mutate(ar_source=ifelse(nutrient=="Iron", "EFSA", ar_source),
          ar_units=ifelse(nutrient=="Iron", "mg", ar_units),
@@ -330,7 +341,7 @@ cntry_key <- data %>%
   # Reduce to single nutrient (so population doesn't get double counted)
   filter(nutrient=="Calcium") %>%
   # Summarize
-  group_by(continent, country, iso3, protein_g, phytate_mg) %>% # hdi, hdi_catg
+  group_by(continent, country, iso3,  protein_g, phytate_mg) %>% # hdi, hdi_catg, protein_g, iron_abs
   summarize(npeople=sum(npeople),
             gdd_yn=unique(gdd_type)) %>%
   ungroup()

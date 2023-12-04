@@ -40,9 +40,15 @@ data <- phytate_orig %>%
   rename(asf_g=supply_med) %>%
   # Reduce
   na.omit() %>%
+  # Add South sudan
+  bind_rows(.,
+            tibble(country="South Sudan",
+                   iso3="SSD",
+                   phytate_mg=1548, # from Central African Republic (not Sudan b/c forested)
+                   asf_g=78.40906)) %>%
   # Scale
-  mutate(phytate_q=scales::rescale(data$phytate_mg, to=c(1,0)),
-         asf_q=scales::rescale(data$asf_g, to=c(0,1)),
+  mutate(phytate_q=scales::rescale(phytate_mg, to=c(1,0)),
+         asf_q=scales::rescale(asf_g, to=c(0,1)),
          mean_q=(phytate_q+asf_q)/2,
          bioavailability=scales::rescale(mean_q, to=c(5,16)),
          bioavailability_cap=pmin(bioavailability, 12))
