@@ -7,6 +7,7 @@
 rm(list = ls())
 
 # Packages
+# Make sure plyr is unchecked
 library(countrycode)
 library(ggbiplot) # devtools::install_github("vqv/ggbiplot")
 library(vegan)
