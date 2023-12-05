@@ -246,8 +246,8 @@ g <- ggplot(data, aes(x=age, y=ar_mg, size=diet_type, group=diet_type)) +
 g
 
 # Export figure
-ggsave(g, filename=file.path(plotdir, "FigS7_average_requirements_zinc_phytate.png"),
-       width=6.5, height=3, units="in", dpi=600)
+# ggsave(g, filename=file.path(plotdir, "FigS7_average_requirements_zinc_phytate.png"),
+#        width=6.5, height=3, units="in", dpi=600)
 
 
 # Build ARS for paper

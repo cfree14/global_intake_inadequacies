@@ -72,7 +72,7 @@ g <- ggplot(world_sm, aes(fill=gdd_yn)) +
   geom_sf(lwd=0.1, color="grey30") +
   # geom_sf(data=world_tiny, color="grey30", size=1.5, pch=21) +
   # Plot links
-  geom_segment(data=gdd_match_key, mapping=aes(x=long1, xend=long2, y=lat1, yend=lat2), inherit.aes = F, lwd=0.4) +
+  geom_segment(data=gdd_match_key, mapping=aes(x=long1, xend=long2, y=lat1, yend=lat2), inherit.aes = F, linewidth=0.4) +
   # Plot nodes
   geom_point(data=gdd_match_key, mapping=aes(x=long1, y=lat1), color="darkred", inherit.aes = F, size=0.25) +
   geom_point(data=gdd_match_key, mapping=aes(x=long2, y=lat2), color="black", inherit.aes = F, size=0.25) +

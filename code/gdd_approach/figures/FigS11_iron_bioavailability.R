@@ -118,7 +118,9 @@ g2 <- ggplot(world_sm, aes(fill=bioavailability)) +
   theme_bw() + my_theme +
   theme(legend.key.size = unit(0.5, "cm"),
         legend.direction="horizontal",
-        legend.position = c(0.15, 0.16))
+        legend.position = c(0.15, 0.16),
+        axis.text=element_blank(),
+        axis.ticks = element_blank())
 g2
 
 # Arrange

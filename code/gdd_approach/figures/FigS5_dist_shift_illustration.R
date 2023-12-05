@@ -82,7 +82,7 @@ x <- seq(0,600,1)
 meanlog1 <- 5.5208332
 sdlog1 <- 0.2986003
 log_mu1 <- nutriR::mean_dist(meanlog=meanlog1, sdlog=sdlog1)
-log_mu_dens1 <- dlnorm(log_mu1, meanlog = meanlog_hi, sdlog=sdlog_hi)
+log_mu_dens1 <- dlnorm(log_mu1, meanlog = meanlog1, sdlog=sdlog1)
 log_intakes1 <- dlnorm(x, meanlog=meanlog1, sdlog=sdlog1)
 
 # Upshift

@@ -185,7 +185,7 @@ g <- ggplot(data, aes(x=age, y=ar_mg, size=abs_level, group=abs_level)) +
 g
 
 # # Export figure
-# ggsave(g, filename=file.path(plotdir, "FigS8_average_requirements_iron_protein.png"),
+# ggsave(g, filename=file.path(plotdir, "FigS8_average_requirements_iron_bioavailability.png"),
 #        width=6.5, height=3, units="in", dpi=600)
 
 
