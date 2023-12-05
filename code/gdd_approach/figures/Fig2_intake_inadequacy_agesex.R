@@ -64,7 +64,11 @@ data <- data_orig %>%
                              "Southern Europe"="S Europe",
                              "Sub-Saharan Africa"="SS Africa",
                              "Western Asia"="W Asia",
-                             "Western Europe"="W Europe"))
+                             "Western Europe"="W Europe")) %>%
+  # Add region order
+  group_by(nutrient, region) %>%
+  mutate(pdeficient_region=sum(ndeficient, na.rm=T)/sum(npeople, na.rm=T)) %>%
+  ungroup()
 
 # Region order
 region_order <- data %>%
@@ -75,9 +79,7 @@ region_order <- data %>%
 # Order data
 data_ordered <- data %>%
   # Order nutrient
-  mutate(nutrient=factor(nutrient, levels=nutrient_key$nutrient)) %>%
-  # Order region
-  mutate(region_short=factor(region_short, levels=region_order$region_short))
+  mutate(nutrient=factor(nutrient, levels=nutrient_key$nutrient))
 
 # Break into two
 nutrients <- nutrient_key$nutrient
@@ -107,11 +109,14 @@ my_theme <- theme(axis.text=element_text(size=5),
                   legend.background = element_rect(fill=alpha('blue', 0)))
 
 # Plot
-g1 <- ggplot(data1, aes(x=age_range, y=region_short, fill=pdeficient)) +
-  facet_grid(nutrient~sex) +
+g1 <- ggplot(data1, aes(x=age_range,
+                        y=tidytext::reorder_within(region_short, pdeficient_region, nutrient),
+                        fill=pdeficient)) +
+  facet_grid(nutrient~sex, scales = "free") +
   geom_tile() +
   # Labels
   labs(x="Age range (yr)", y="") +
+  tidytext::scale_y_reordered() +
   # Legend
   scale_fill_gradientn(name="% inadequate",
                        lim=c(0,1),
@@ -124,11 +129,14 @@ g1 <- ggplot(data1, aes(x=age_range, y=region_short, fill=pdeficient)) +
 g1
 
 # Plot
-g2 <- ggplot(data2, aes(x=age_range, y=region_short, fill=pdeficient)) +
-  facet_grid(nutrient~sex) +
+g2 <- ggplot(data2, aes(x=age_range,
+                        y=tidytext::reorder_within(region_short, pdeficient_region, nutrient),
+                        fill=pdeficient)) +
+  facet_grid(nutrient~sex, scales="free") +
   geom_tile() +
   # Labels
   labs(x="Age range (yr)", y="") +
+  tidytext::scale_y_reordered() +
   # Legend
   scale_fill_gradientn(name="% inadequate",
                        lim=c(0,1),
@@ -148,5 +156,5 @@ g
 
 # Export
 ggsave(g, filename=file.path(plotdir, "Fig2_intake_inadequacy_agesex.png"),
-       width=6.5, height=7.5, units="in", dpi=600)
+       width=6.5, height=7.75, units="in", dpi=600)
 
