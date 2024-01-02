@@ -43,7 +43,8 @@ region_key <- region_key_orig %>%
 fg <- fg_orig %>%
   mutate(country="French Guiana",
          iso3="GUF",
-         region="Latin Amercia & Caribbean")
+         region="Latin Amercia & Caribbean") %>%
+  select(iso3, country, region, geometry)
 
 # Data
 world_sm <- world_sm_orig %>%
@@ -53,9 +54,9 @@ world_sm <- world_sm_orig %>%
   # Fill in missing regions
   mutate(region=case_when(country=="Antarctica" ~ NA,
                           country=="French Southern Territories" ~ NA,
-                          country=="Northern Cyprus" ~ "Europe & Central America",
+                          country=="Northern Cyprus" ~ "Europe & Central Asia",
                           country=="Falkland Islands" ~ "Latin Amercia & Caribbean",
-                          country=="Kosovo" ~  "Europe & Central America",
+                          country=="Kosovo" ~  "Europe & Central Asia",
                           country=="Western Sahara" ~ "Middle East & North Africa",
                           country=="Somaliland" ~ "Sub-Saharan Africa",
                           country=="Taiwan" ~ "East Asia & Pacific",
@@ -64,9 +65,30 @@ world_sm <- world_sm_orig %>%
 # Centers
 world_centers <- world_centers_orig %>%
   # Filter to small
-  filter(area_sqkm<=25000) %>%
+  # filter(area_sqkm<=25000) %>%
   # Add region
-  left_join(region_key %>% select(iso3, region))
+  left_join(region_key %>% select(iso3, region)) %>%
+  # Fill in missing regions
+  mutate(region=case_when(country=="Antarctica" ~ NA,
+                          country=="French Southern Territories" ~ NA,
+                          country=="Northern Cyprus" ~ "Europe & Central Asia",
+                          country=="Falkland Islands" ~ "Latin Amercia & Caribbean",
+                          country=="Kosovo" ~  "Europe & Central Asia",
+                          country=="Western Sahara" ~ "Middle East & North Africa",
+                          country=="Somaliland" ~ "Sub-Saharan Africa",
+                          country=="Taiwan" ~ "East Asia & Pacific",
+                          T ~ region))
+
+# Make key
+region_key_out <- bind_rows(fg %>% sf::st_drop_geometry(),
+                            world_centers %>% sf::st_drop_geometry()) %>%
+  arrange(iso3) %>%
+  # Select
+  select(iso3, country, region) %>%
+  filter(!is.na(region))
+
+# Export
+saveRDS(region_key_out, file = file.path("data/wb_regions/region_key.Rds"))
 
 
 # Plot data

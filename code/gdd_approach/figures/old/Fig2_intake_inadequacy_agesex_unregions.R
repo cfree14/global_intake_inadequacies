@@ -31,29 +31,48 @@ nutrient_key <- read.csv(file=file.path(tabledir, "TableS1_global_inadequacies.c
 data <- data_orig %>%
   # Remove Vitamin D
   filter(nutrient!="Vitamin D") %>%
+  # Add region
+  mutate(region=countrycode::countrycode(iso3, "iso3c", "un.regionsub.name")) %>%
+  mutate(region=case_when(iso3=="CHI" ~ "Western Europe",
+                          iso3=="XKX" ~ "Southern Europe",
+                          iso3=="TWN" ~ "Eastern Asia",
+                          T ~ region)) %>%
+  mutate(region=recode(region,
+                       "Latin America and the Caribbean"="Latin America / Caribbean",
+                       "Australia and New Zealand"="Australia / New Zealand")) %>%
   # Summarize
   group_by(nutrient, region, sex, age_range) %>%
   summarize(npeople=sum(npeople, na.rm=T),
            ndeficient=sum(ndeficient, na.rm=T)) %>%
   mutate(pdeficient=ndeficient/npeople) %>%
   ungroup() %>%
+  # Add short region
+  mutate(region_short=recode(region,
+                             "Australia / New Zealand"="NZ/Australia",
+                             "Central Asia"="C Asia",
+                             "Eastern Asia"="E Asia",
+                             "Eastern Europe"="E Europe",
+                             "Latin America / Caribbean"="Lat. America",
+                             # "Melanesia"="",
+                             # "Micronesia"="",
+                             "Northern Africa"="N Africa",
+                             "Northern America"="N America",
+                             "Northern Europe"="N Europe",
+                             # "Polynesia"="",
+                             "South-eastern Asia"="SE Asia",
+                             "Southern Asia"="S Asia",
+                             "Southern Europe"="S Europe",
+                             "Sub-Saharan Africa"="SS Africa",
+                             "Western Asia"="W Asia",
+                             "Western Europe"="W Europe")) %>%
   # Add region order
   group_by(nutrient, region) %>%
   mutate(pdeficient_region=sum(ndeficient, na.rm=T)/sum(npeople, na.rm=T)) %>%
-  ungroup() %>%
-  # Add short region
-  mutate(region_short=recode(region,
-                             "East Asia & Pacific"="E Asia & Pacific",
-                             "Europe & Central Asia"="Europe & C Asia",
-                             "Latin America & Caribbean"="L America & Carib",
-                             "Middle East & North Africa"="Mid East & N Africa",
-                             "North America"="N America",
-                             "South Asia"="S Asia",
-                             "Sub-Saharan Africa"="SS Africa"))
+  ungroup()
 
 # Region order
 region_order <- data %>%
-  group_by(region, region_short) %>%
+  group_by(region_short) %>%
   summarize(pdeficient=median(pdeficient)) %>%
   arrange(pdeficient)
 
@@ -137,5 +156,5 @@ g
 
 # Export
 ggsave(g, filename=file.path(plotdir, "Fig2_intake_inadequacy_agesex.png"),
-       width=6.5, height=6, units="in", dpi=600)
+       width=6.5, height=7.75, units="in", dpi=600)
 

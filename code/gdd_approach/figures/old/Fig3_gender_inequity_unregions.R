@@ -23,14 +23,20 @@ data_orig <- readRDS(file.path(outdir, "2018_subnational_nutrient_intake_inadequ
 # Build data
 ################################################################################
 
-# Nutrient order (when by SEVs)
-# nutrient_key <- read.csv(file=file.path(tabledir, "TableS1_global_inadequacies.csv"), as.is=T)  %>%
-#   arrange(desc(pdeficient))
+# Nutrient order
+nutrient_key <- read.csv(file=file.path(tabledir, "TableS1_global_inadequacies.csv"), as.is=T)  %>%
+  arrange(desc(pdeficient))
 
 # Build data
 data <- data_orig %>%
   # Remove Vitamin D
   filter(nutrient!="Vitamin D") %>%
+  # Add region
+  mutate(region=countrycode::countrycode(iso3, "iso3c", "un.regionsub.name")) %>%
+  mutate(region=case_when(iso3=="CHI" ~ "Western Europe",
+                          iso3=="XKX" ~ "Southern Europe",
+                          iso3=="TWN" ~ "Eastern Asia",
+                          T ~ region)) %>%
   # Summarize
   group_by(nutrient, region, iso3, country, sex, age_range) %>%
   summarize(npeople=sum(npeople, na.rm=T),
@@ -45,27 +51,7 @@ data <- data_orig %>%
   # Add difference type
   group_by(nutrient, region) %>%
   mutate(pdiff_type=ifelse(median(pdiff, na.rm=T)>=0, "Females", "Males")) %>%
-  ungroup() %>%
-  # Add short region
-  mutate(region_short=recode(region,
-                             "East Asia & Pacific"="E Asia & Pacific",
-                             "Europe & Central Asia"="Europe & C Asia",
-                             "Latin America & Caribbean"="L America & Carib",
-                             "Middle East & North Africa"="Mid East & N Africa",
-                             "North America"="N America",
-                             "South Asia"="S Asia",
-                             "Sub-Saharan Africa"="SS Africa"))
-
-# Nutrient order
-nutrient_key <- data %>%
-  filter(nutrient!="Vitamin D") %>%
-  group_by(nutrient, region) %>%
-  summarize(pdiff=median(pdiff, na.rm=T)) %>%
-  ungroup() %>%
-  group_by(nutrient) %>%
-  summarize(pdiff=median(pdiff, na.rm=T)) %>%
-  ungroup()  %>%
-  arrange(desc(pdiff))
+  ungroup()
 
 # Region order
 region_order <- data %>%
@@ -125,6 +111,6 @@ g
 
 # Export data
 ggsave(g, filename=file.path(plotdir, "Fig3_gender_inequity.png"),
-       width=6.5, height=5.5, units="in", dpi=600)
+       width=6.5, height=6.5, units="in", dpi=600)
 
 
