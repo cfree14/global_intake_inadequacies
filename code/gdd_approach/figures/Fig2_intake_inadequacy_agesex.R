@@ -138,4 +138,5 @@ g
 # Export
 ggsave(g, filename=file.path(plotdir, "Fig2_intake_inadequacy_agesex.png"),
        width=6.5, height=6, units="in", dpi=600)
-
+ggsave(g, filename=file.path(plotdir, "Fig2_intake_inadequacy_agesex.pdf"),
+       width=6.5, height=6, units="in", dpi=600)

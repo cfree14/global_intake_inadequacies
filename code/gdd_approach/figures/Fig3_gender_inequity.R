@@ -126,5 +126,6 @@ g
 # Export data
 ggsave(g, filename=file.path(plotdir, "Fig3_gender_inequity.png"),
        width=6.5, height=5.5, units="in", dpi=600)
-
+ggsave(g, filename=file.path(plotdir, "Fig3_gender_inequity.pdf"),
+       width=6.5, height=5.5, units="in", dpi=600)
 

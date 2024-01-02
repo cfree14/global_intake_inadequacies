@@ -128,6 +128,7 @@ g
 # Export
 ggsave(g, filename=file.path(plotdir, "Fig1_intake_inadequacy_gdd_new.png"),
        width=6.5, height=3.75, units="in", dpi=600)
-
+ggsave(g, filename=file.path(plotdir, "Fig1_intake_inadequacy_gdd_new.pdf"),
+       width=6.5, height=3.75, units="in", dpi=600)
 
 
