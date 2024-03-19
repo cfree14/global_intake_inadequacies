@@ -42,3 +42,8 @@ freeR::complete(data)
 # Export simplified data
 saveRDS(data, file.path(outdir, "2018_subnational_nutrient_intake_inadequacy_estimates_simple.Rds"))
 
+# Export CSV
+data1 <- data %>%
+  mutate(age_range=paste(age_range, "yrs"))
+write.csv(data1, file.path(outdir, "2018_subnational_nutrient_intake_inadequacy_estimates_simple.csv"), row.names = F)
+
