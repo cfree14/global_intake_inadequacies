@@ -28,6 +28,9 @@ pop_orig <- readRDS(file.path(popdir, "WB_1960_2020_population_size_by_country_a
 hdi_orig <- readRDS(file.path(hdidir, "UNDP_2020_human_development_index.Rds")) %>%
   mutate(hdi_catg=as.character(hdi_catg))
 
+# Read water AI key
+water_ai_key <- readxl::read_excel("data/water_dris.xlsx")
+
 # Get ARs
 ars_orig <- nutriR::nrvs
 dris_orig <- nutriR::dris
@@ -259,8 +262,11 @@ ars_use <- bind_rows(ars_mf, ars_child_m, ars_child_f) %>%
 
 # Merge data
 data <- gdd_harmonized %>%
-  # Adjust calcium intakes
-  mutate(supply_med=ifelse(nutrient=="Calcium", supply_med+1.7*42, supply_med)) %>%
+  # Add water intakes
+  left_join(water_ai_key, by=c("sex", "age_range")) %>%
+  # Adjust calcium and magnesium intakes
+  mutate(supply_med=ifelse(nutrient=="Calcium", supply_med+water_l_day*46, supply_med)) %>%
+  mutate(supply_med=ifelse(nutrient=="Magnesium", supply_med+water_l_day*16, supply_med)) %>%
   # Add population data
   left_join(pop %>% select(-c(year, country)), by=c("iso3", "sex", "age_range")) %>%
   # Add HDI
