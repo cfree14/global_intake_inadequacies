@@ -18,6 +18,8 @@ saveRDS(world_centers, file.path(datadir_shiny, "world_centroids.Rds"))
 # Read data
 data_orig <- readRDS(file.path(datadir, "2018_subnational_nutrient_intake_inadequacy_estimates_full.Rds"))
 data <- data_orig %>%
+  # Remove GDD borrowed countries
+  filter(gdd_type=="Reported") %>%
   # Simplify
   select(continent, iso3, country, nutrient, units, sex, age_range,
          supply_med, ar, ar_source, ar_cv,
@@ -34,6 +36,9 @@ data <- data_orig %>%
   ungroup() %>%
   # Remove Vitamin D
   filter(nutrient!="Vitamin D")
+
+# Number of countries
+n_distinct(data$iso3)
 
 # Export data
 saveRDS(data, file.path(datadir_shiny, "2018_subnational_nutrient_intake_inadequacy_estimates.Rds"))

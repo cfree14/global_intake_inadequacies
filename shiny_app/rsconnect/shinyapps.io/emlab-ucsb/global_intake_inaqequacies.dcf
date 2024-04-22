@@ -5,9 +5,7 @@ account: emlab-ucsb
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 6508383
-bundleId: 6018545
+bundleId: 8527691
 url: https://emlab-ucsb.shinyapps.io/global_intake_inaqequacies/
-when: 1655499937.27763
-lastSyncTime: 1655499937.27764
 asMultiple: FALSE
 asStatic: FALSE

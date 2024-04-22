@@ -31,7 +31,7 @@ data <- data_orig %>%
   left_join(region_key %>% select(iso3, region), by="iso3") %>%
   mutate(region=ifelse(country=="Channel Islands", "Europe & Central Asia", region)) %>%
   # Select
-  select(continent, region, iso3, country, nutrient, units, sex, age_range,
+  select(continent, region, iso3, country, gdd_type, nutrient, units, sex, age_range,
          supply_med, ar, ar_source, sev, npeople, ndeficient) %>%
   # Rename
   rename(intake=supply_med)
