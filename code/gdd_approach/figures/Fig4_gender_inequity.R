@@ -31,6 +31,8 @@ data_orig <- readRDS(file.path(outdir, "2018_subnational_nutrient_intake_inadequ
 data <- data_orig %>%
   # Remove Vitamin D
   filter(nutrient!="Vitamin D") %>%
+  # Remove GDD borrowed countris
+  filter(gdd_type=="Reported") %>%
   # Summarize
   group_by(nutrient, region, iso3, country, sex, age_range) %>%
   summarize(npeople=sum(npeople, na.rm=T),
@@ -124,8 +126,8 @@ g <- ggplot(data_ordered, aes(x=pdiff, y=region, fill=pdiff_type)) +
 g
 
 # Export data
-ggsave(g, filename=file.path(plotdir, "Fig3_gender_inequity.png"),
+ggsave(g, filename=file.path(plotdir, "Fig4_gender_inequity.png"),
        width=6.5, height=5.5, units="in", dpi=600)
-ggsave(g, filename=file.path(plotdir, "Fig3_gender_inequity.pdf"),
+ggsave(g, filename=file.path(plotdir, "Fig4_gender_inequity.pdf"),
        width=6.5, height=5.5, units="in", dpi=600)
 

@@ -31,6 +31,8 @@ nutrient_key <- read.csv(file=file.path(tabledir, "TableS1_global_inadequacies.c
 data <- data_orig %>%
   # Remove Vitamin D
   filter(nutrient!="Vitamin D") %>%
+  # Remove GDD borrowed countris
+  filter(gdd_type=="Reported") %>%
   # Summarize
   group_by(nutrient, region, sex, age_range) %>%
   summarize(npeople=sum(npeople, na.rm=T),
@@ -136,7 +138,7 @@ g <- gridExtra::grid.arrange(g1, g2, ncol=2, widths=c(0.5, 0.5))
 g
 
 # Export
-ggsave(g, filename=file.path(plotdir, "Fig2_intake_inadequacy_agesex.png"),
+ggsave(g, filename=file.path(plotdir, "Fig3_intake_inadequacy_agesex.png"),
        width=6.5, height=6, units="in", dpi=600)
-ggsave(g, filename=file.path(plotdir, "Fig2_intake_inadequacy_agesex.pdf"),
+ggsave(g, filename=file.path(plotdir, "Fig3_intake_inadequacy_agesex.pdf"),
        width=6.5, height=6, units="in", dpi=600)

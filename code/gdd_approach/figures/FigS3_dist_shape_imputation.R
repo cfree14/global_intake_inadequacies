@@ -169,7 +169,7 @@ g <- gridExtra::grid.arrange(g1, g2, nrow=1, widths=c(0.55, 0.45))
 g
 
 # Export
-ggsave(g, filename=file.path(plotdir, "FigS4_dist_shape_imputation.png"),
+ggsave(g, filename=file.path(plotdir, "FigS3_dist_shape_imputation.png"),
        width=6.5, height=3.5, units="in", dpi=600)
 
 

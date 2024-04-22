@@ -61,7 +61,7 @@ data <- data_orig %>%
 ################################################################################
 
 # Export table
-write.csv(data, file=file.path(tabledir, "TableS4_age_group_key.csv"), row.names=F)
+write.csv(data, file=file.path(tabledir, "TableS3_age_group_key.csv"), row.names=F)
 
 
 

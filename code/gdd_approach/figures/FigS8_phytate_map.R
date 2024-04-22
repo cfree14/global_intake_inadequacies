@@ -91,7 +91,7 @@ g
 
 
 # Export
-ggsave(g, filename=file.path(plotdir, "FigS9_phytate_map.png"),
+ggsave(g, filename=file.path(plotdir, "FigS8_phytate_map.png"),
        width=6.5, height=2, units="in", dpi=600)
 
 

@@ -132,7 +132,7 @@ g <- gridExtra::grid.arrange(g1, g2, nrow=1, widths=c(0.25, 0.75))
 g
 
 # Export
-ggsave(g, filename=file.path(plotdir, "FigS10_gdd_animal_foods.png"),
+ggsave(g, filename=file.path(plotdir, "FigS9_gdd_animal_foods.png"),
        width=6.5, height=2.25, units="in", dpi=600)
 
 

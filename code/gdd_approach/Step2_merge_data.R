@@ -113,7 +113,7 @@ isos2match <- pop_orig %>%
 write.csv(isos2match, file=file.path(tabledir, "TableSX_countries_without_gdd_data.csv"), row.names=F)
 
 # Read GDD country match key
-gdd_match_key <- readxl::read_excel(file.path(tabledir, "TableS3_countries_without_gdd_data.xlsx"), skip=1) %>%
+gdd_match_key <- readxl::read_excel(file.path(tabledir, "TableSX_countries_without_gdd_data.xlsx"), skip=1) %>%
   # Rename
   setNames(c("iso1", "country1", "iso2", "country2"))
 

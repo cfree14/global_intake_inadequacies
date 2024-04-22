@@ -30,7 +30,9 @@ world_centers <- readRDS(file=file.path(gisdir, "world_centroids.Rds"))
 
 # Build data
 data <- data_orig %>%
-  # Remove Vitmin D
+  # Remove GDD borrowed
+  filter(gdd_type=="Reported") %>%
+  # Remove Vitamin D
   filter(nutrient!="Vitamin D") %>%
   # Calculate stats
   group_by(nutrient, continent, iso3, country) %>%
@@ -39,45 +41,61 @@ data <- data_orig %>%
   mutate(pdeficient=ndeficient/npeople) %>%
   ungroup()
 
+# Summarize studided pop
+npeople_tot <- data %>%
+  filter(nutrient=="Calcium") %>%
+  pull(npeople) %>% sum()
+npeople_tot / 1e9
+
 # Build labels
 stat_labels <- data %>%
   group_by(nutrient) %>%
-  summarize(npeople=sum(npeople, na.rm=T),
-            ndeficient=sum(ndeficient, na.rm=T)) %>%
-  mutate(pdeficient=ndeficient/npeople,
-         subtitle=paste0(round(ndeficient/1e9, 2), " billion people, ", round(pdeficient*100,1), "% of world"),
-         nutrient_label=paste0(nutrient, "\n", subtitle)) %>%
+  summarize(ndeficient=sum(ndeficient, na.rm=T)) %>%
+  mutate(pdeficient=ndeficient/npeople_tot,
+         subtitle=paste0(round(ndeficient/1e9, 2), " bllion people, ", round(pdeficient*100,1), "% of world"),
+         nutrient_label1=paste0(nutrient, "\n", subtitle),
+         nutrient_label2=paste0(nutrient, " | ", round(ndeficient/1e9, 1), " billion (", round(pdeficient*100,0), "%)")) %>%
   ungroup() %>%
   arrange(desc(pdeficient))
 
 # Add labels
 data1 <- data %>%
-  left_join(stat_labels %>% select(nutrient, nutrient_label))
+  left_join(stat_labels %>% select(nutrient, nutrient_label1, nutrient_label2), by="nutrient")
 
 # Nutrients
-nutrients <- stat_labels$nutrient_label
+nutrients <- stat_labels$nutrient
 
 # Add to spatial data
 x <- nutrients[1]
 data_sf <- purrr::map_df(nutrients, function(x){
   out <- world_sm %>%
     select(-country) %>%
-    left_join(data1 %>% filter(nutrient_label==x), by="iso3") %>%
-    mutate(nutrient=x)
-}) %>% mutate(nutrient=factor(nutrient, levels=nutrients))
+    # Add nutrient info
+    left_join(data1 %>% filter(nutrient==x), by="iso3") %>%
+    # Fill in missing values
+    mutate(nutrient=na.omit(unique(nutrient)),
+           nutrient_label1=na.omit(unique(nutrient_label1)),
+           nutrient_label2=na.omit(unique(nutrient_label2)))
+}) %>% mutate(nutrient_label1=factor(nutrient_label1, levels=stat_labels$nutrient_label1),
+              nutrient_label2=factor(nutrient_label2, levels=stat_labels$nutrient_label2))
 
 
 # Create points for small countries
 data_pts <- purrr::map_df(nutrients, function(x){
   out <- world_centers %>%
     select(-country) %>%
-    left_join(data1 %>% filter(nutrient_label==x), by="iso3") %>%
-    mutate(nutrient=x) %>%
+    left_join(data1 %>% filter(nutrient==x), by="iso3") %>%
+    # Fill in missing values
+    mutate(nutrient=na.omit(unique(nutrient)),
+           nutrient_label1=na.omit(unique(nutrient_label1)),
+           nutrient_label2=na.omit(unique(nutrient_label2))) %>%
+  # Filter to tiny places with data
     filter(area_sqkm<=25000 & !is.na(pdeficient))
-}) %>% mutate(nutrient=factor(nutrient, levels=nutrients))
+}) %>% mutate(nutrient_label1=factor(nutrient_label1, levels=stat_labels$nutrient_label1),
+              nutrient_label2=factor(nutrient_label2, levels=stat_labels$nutrient_label2))
 
-levels(data_pts$nutrient)
-levels(data_sf$nutrient)
+levels(data_pts$nutrient_label2)
+levels(data_sf$nutrient_label2)
 
 
 # Plot data
@@ -88,7 +106,7 @@ theme1 <- theme(axis.text=element_blank(),
                 axis.title=element_blank(),
                 legend.text=element_text(size=5),
                 legend.title=element_text(size=6),
-                strip.text=element_text(size=6, hjust=0.5), # face="bold"
+                strip.text=element_text(size=6, hjust=0), # face="bold"
                 # Borders/axes
                 strip.background=element_blank(),
                 axis.line.x = element_blank(),
@@ -109,7 +127,7 @@ theme1 <- theme(axis.text=element_blank(),
 # Plot data
 g <- ggplot() +
   # Facet
-  facet_wrap(~nutrient, ncol=3) +
+  facet_wrap(~nutrient_label2, ncol=3) +
   # Plot data
   geom_sf(data=data_sf, mapping=aes(fill=pdeficient), lwd=0.1) +
   geom_point(data=data_pts, mapping=aes(x=long_dd, y=lat_dd, fill=pdeficient), pch=21, size=0.9, inherit.aes = F, stroke=0.2) +
@@ -129,9 +147,9 @@ g <- ggplot() +
 g
 
 # Export
-ggsave(g, filename=file.path(plotdir, "Fig1_intake_inadequacy_gdd_new_tall.png"),
-       width=6.5, height=6, units="in", dpi=600)
-# ggsave(g, filename=file.path(plotdir, "Fig1_intake_inadequacy_gdd_new_tall.pdf"),
-#        width=6.5, height=3.75, units="in", dpi=600)
+ggsave(g, filename=file.path(plotdir, "Fig2_intake_inadequacy_gdd_new_tall.png"),
+       width=6.5, height=5.5, units="in", dpi=600) # 6 in when double line legend
+ggsave(g, filename=file.path(plotdir, "Fig2_intake_inadequacy_gdd_new_tall.pdf"),
+       width=6.5, height=5.75, units="in", dpi=600)
 
 

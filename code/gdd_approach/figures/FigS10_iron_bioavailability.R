@@ -128,7 +128,7 @@ g <- gridExtra::grid.arrange(g1, g2, nrow=1, widths=c(0.25, 0.75))
 g
 
 # Export
-ggsave(g, filename=file.path(plotdir, "FigS11_iron_bioavailability.png"),
+ggsave(g, filename=file.path(plotdir, "FigS10_iron_bioavailability.png"),
        width=6.5, height=2.25, units="in", dpi=600)
 
 

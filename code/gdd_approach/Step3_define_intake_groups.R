@@ -90,6 +90,7 @@ diff_df <- diss_mat %>%
 
 # Export dissimilarity matrix
 saveRDS(diff_df, file=file.path(outdir, "GDD_country_dissimilarity.Rds"))
+save(diff_df, cntry_key_seps, file=file.path(outdir, "GDD_country_dissimilarity_for_figure.Rdata"))
 
 # Plot dissimilarity
 g <- ggplot(diff_df, aes(x=iso1, y=iso2, fill=diss)) +
@@ -120,9 +121,6 @@ g <- ggplot(diff_df, aes(x=iso1, y=iso2, fill=diss)) +
         legend.position="bottom")
 g
 
-# Export figure
-ggsave(g, filename=file.path(plotdir, "FigS3_gdd_diss_matrix.png"),
-       width=6.5, height=6.5, units="in", dpi=600)
 
 
 

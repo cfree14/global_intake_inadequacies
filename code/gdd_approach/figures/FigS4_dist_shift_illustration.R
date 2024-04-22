@@ -165,7 +165,7 @@ g <- ggplot(data, aes(x=intake, y=density, color=scenario)) +
 g
 
 # Export figure
-ggsave(g, filename=file.path(plotdir, "FigS5_dist_shift_illustration.png"),
+ggsave(g, filename=file.path(plotdir, "FigS4_dist_shift_illustration.png"),
        width=6.5, height=3.5, units="in", dpi=600)
 
 

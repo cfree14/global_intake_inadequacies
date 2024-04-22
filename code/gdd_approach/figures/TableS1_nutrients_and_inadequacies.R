@@ -26,6 +26,8 @@ data_orig <- readRDS(file.path(outdir, "2018_subnational_nutrient_intake_inadequ
 data <- data_orig %>%
   # Remove Vitamin D
   filter(nutrient!="Vitamin D") %>%
+  # Remove GDD borrowed countries
+  filter(gdd_type=="Reported") %>%
   # Calculate global deficiency stats
   group_by(nutrient, units, ar_source) %>%
   summarize(npeople=sum(npeople, na.rm=T),

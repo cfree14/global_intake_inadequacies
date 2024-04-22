@@ -131,7 +131,7 @@ g
 
 
 # Export
-ggsave(g, filename=file.path(plotdir, "FigS12_subregion_map.png"),
+ggsave(g, filename=file.path(plotdir, "FigS11_subregion_map.png"),
        width=6.5, height=3.25, units="in", dpi=600)
 
 

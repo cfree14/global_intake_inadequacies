@@ -71,7 +71,7 @@ g <- ggplot(data, aes(x=age_range, y=ar, color=sex, group=sex, linetype=ar_sourc
 g
 
 # Export
-ggsave(g, filename=file.path(plotdir, "FigS6_average_requirements.png"),
+ggsave(g, filename=file.path(plotdir, "FigS5_average_requirements.png"),
        width=6.5, height=6.5, units="in", dpi=600)
 
 
