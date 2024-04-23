@@ -88,7 +88,7 @@ data_ordered <- data %>%
 ################################################################################
 
 # Theme
-my_theme <- theme(axis.text.y=element_text(size=5),
+my_theme <- theme(axis.text.y=element_text(size=6),
                   axis.text.x=element_text(size=6),
                   axis.title=element_text(size=7),
                   axis.title.y=element_blank(),
