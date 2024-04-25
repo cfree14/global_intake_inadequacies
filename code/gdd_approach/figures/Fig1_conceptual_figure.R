@@ -190,7 +190,7 @@ g2 <- ggplot(ar_df, aes(x=ar, ymax=density, ymin=0)) +
   # Requirement
   geom_segment(x=params$ar, xend=params$ar, y=0, yend=ymax2, linetype="dotted") +
   # Plot param labels
-  annotate(geom="text", x=xmax2, y=ymax2_lim, label="Mean: Allen et al. 2022", color="black", hjust=1, size=2) +
+  annotate(geom="text", x=xmax2, y=ymax2_lim, label="Mean: Allen et al. 2020", color="black", hjust=1, size=2) +
   annotate(geom="text", x=xmax2, y=ymax2_lim*0.92, label="CV: Renwick et al. 2004", color="grey50", hjust=1, size=2) +
   # Labels
   labs(x=xtitle2, y="Density", tag="B", title="2. Derive requirement distribution") +
