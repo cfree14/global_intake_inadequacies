@@ -17,11 +17,14 @@ tabledir <- "tables/gdd_approach"
 gisdir <- "data/world/processed"
 
 # Read data
-data <- read.csv(file=file.path(outdir, "country_key_gdd.csv"), as.is=T)
+data <- read.csv(file=file.path(outdir, "country_key_gdd.csv"), as.is=T) %>%
+  mutate(gdd_yn1=recode_factor(gdd_yn,
+                               "Borrowed"="No",
+                               "Reported"="Yes"))
 
 # Read world data
 world_lg_orig <- readRDS(file=file.path(gisdir, "world_large.Rds"))
-world_sm_orig <- readRDS(file=file.path(gisdir, "world_small.Rds"))
+world_sm_orig <- readRDS(file=file.path(gisdir, "world_small.Rds")) %>% sf::st_as_sf()
 world_centers_orig <- readRDS(file=file.path(gisdir, "world_centroids.Rds"))
 
 
@@ -29,7 +32,7 @@ world_centers_orig <- readRDS(file=file.path(gisdir, "world_centroids.Rds"))
 ################################################################################
 
 # Read GDD country match key
-gdd_match_key <- readxl::read_excel(file.path(tabledir, "TableS3_countries_without_gdd_data.xlsx"), skip=1) %>%
+gdd_match_key <- readxl::read_excel(file.path(tabledir, "TableSX_countries_without_gdd_data.xlsx"), skip=1) %>%
   # Rename
   setNames(c("iso1", "country1", "iso2", "country2")) %>%
   # Add centroids 1
@@ -41,9 +44,9 @@ gdd_match_key <- readxl::read_excel(file.path(tabledir, "TableS3_countries_witho
 
 # Add population info
 world_sm <- world_sm_orig %>%
-  left_join(data %>% select(iso3, gdd_yn))
+  left_join(data %>% select(iso3, gdd_yn, gdd_yn1))
 world_centers <- world_centers_orig %>%
-  left_join(data %>% select(iso3, gdd_yn)) %>%
+  left_join(data %>% select(iso3, gdd_yn, gdd_yn1)) %>%
   filter(area_sqkm<=25000 & !is.na(gdd_yn))
 
 
@@ -68,14 +71,14 @@ my_theme <-  theme(axis.text=element_blank(),
 
 
 # Plot gdd coverage
-g <- ggplot(world_sm, aes(fill=gdd_yn)) +
+g <- ggplot(world_sm, aes(fill=gdd_yn1)) +
   geom_sf(lwd=0.1, color="grey30") +
   # geom_sf(data=world_tiny, color="grey30", size=1.5, pch=21) +
   # Plot links
-  geom_segment(data=gdd_match_key, mapping=aes(x=long1, xend=long2, y=lat1, yend=lat2), inherit.aes = F, linewidth=0.4) +
+  # geom_segment(data=gdd_match_key, mapping=aes(x=long1, xend=long2, y=lat1, yend=lat2), inherit.aes = F, linewidth=0.4) +
   # Plot nodes
-  geom_point(data=gdd_match_key, mapping=aes(x=long1, y=lat1), color="darkred", inherit.aes = F, size=0.25) +
-  geom_point(data=gdd_match_key, mapping=aes(x=long2, y=lat2), color="black", inherit.aes = F, size=0.25) +
+  # geom_point(data=gdd_match_key, mapping=aes(x=long1, y=lat1), color="darkred", inherit.aes = F, size=0.25) +
+  # geom_point(data=gdd_match_key, mapping=aes(x=long2, y=lat2), color="black", inherit.aes = F, size=0.25) +
   # Legend
   scale_fill_manual(name="GDD data", values=c("red", "grey90"), na.value = "grey30") +
   # Crop
@@ -85,7 +88,7 @@ g <- ggplot(world_sm, aes(fill=gdd_yn)) +
 g
 
 # Export
-ggsave(g, filename=file.path(plotdir, "FigS2_gdd_data_borrowing.png"),
+ggsave(g, filename=file.path(plotdir, "FigSX_gdd_data_borrowing.png"),
        width=6.5, height=2.5, units="in", dpi=600)
 
 
