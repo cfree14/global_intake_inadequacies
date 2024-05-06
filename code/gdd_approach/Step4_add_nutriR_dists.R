@@ -139,6 +139,9 @@ table(data1$shape_source)
 # Examine: only npeople, HDI, and dist_id_shape should have NAs
 freeR::complete(data1)
 
+# Check that rows aren't doubled (dist ids are unique)
+freeR::which_duplicated(data1$dist_id)
+
 
 # 1. Nearest age within sex
 #######################################
@@ -193,6 +196,10 @@ data2 <- data1 %>%
                               find_closest_age_group_w_data(., dist_id), dist_id_shape)) %>%
   ungroup()
 
+# Check that rows aren't doubled (dist ids are unique)
+freeR::which_duplicated(data1$dist_id)
+freeR::which_duplicated(data2$dist_id)
+
 
 # 2. From opposite sex
 #######################################
@@ -223,6 +230,8 @@ data3 <- data2 %>%
   mutate(dist_id_shape=ifelse(shape_source=="From opposite sex", find_id_of_opposite_sex(., dist_id), dist_id_shape)) %>%
   ungroup()
 
+# Check that rows aren't doubled (dist ids are unique)
+freeR::which_duplicated(data3$dist_id)
 
 # 3. From nearest country
 #######################################
@@ -290,6 +299,9 @@ data4 <- data3 %>%
 # Inspect
 freeR::complete(data4)
 
+# Check that rows aren't doubled (dist ids are unique)
+freeR::which_duplicated(data4$dist_id)
+
 # Add distribution info
 ################################################################################
 
@@ -337,6 +349,9 @@ data6 <- bind_rows(data5_gamma, data5_lognormal) %>%
   # Arrange
   arrange(nutrient, continent, country, sex, age_range)
 freeR::complete(data6)
+
+# Check that rows aren't doubled (dist ids are unique)
+freeR::which_duplicated(data6$dist_id)
 
 # Export data
 saveRDS(data6, file.path(outdir, "2018_subnational_nutrient_intake_inadequacy_estimates_full.Rds"))
