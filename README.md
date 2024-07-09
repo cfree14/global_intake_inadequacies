@@ -1,8 +1,8 @@
 # Estimating global nutrient intake adequacy
 
-This GitHub repository contains the data and code for the following paper in preparation:
+This GitHub repository contains the data and code for the following paper in press:
 
-* Passarelli S, Free CM,  Shepon A, Beal T, Batis C, Golden CD. Estimating global nutrient intake adequacy. Near submission to _The Lancet_.
+* Passarelli S, Free CM,  Shepon A, Beal T, Batis C, Golden CD (in press) Global estimation of dietary micronutrient inadequacies: a modeling analysis. In press at _The Lancet Global Health_.
 
 ## R Shiny web application
 
@@ -18,6 +18,11 @@ The repository is organized using the following structure:
 * output........... folder containing output generated in the analysis
 * tables........... folder containing tables for the manuscript
 * shiny_app..... folder containing data and code for the "nutriR" R Shiny web application
+
+The data files containing the final subnational prevalence of inadequate nutrient intake estimates is located here:
+
+* output/2018_subnational_nutrient_intake_inadequacy_estimates_simple.csv (for anyone)
+* output/2018_subnational_nutrient_intake_inadequacy_estimates_simple.Rds (for R progammers)
 
 Please email Simone Passarelli (simoneapassarelli@gmail.com) if you have any questions about the paper and Chris Free (cfree14@gmail.com) if you have any questions about the data, code, and/or repository.
 
