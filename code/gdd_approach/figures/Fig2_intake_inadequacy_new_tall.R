@@ -97,6 +97,11 @@ data_pts <- purrr::map_df(nutrients, function(x){
 levels(data_pts$nutrient_label2)
 levels(data_sf$nutrient_label2)
 
+# Export
+data_out <- data %>% filter(npeople>0)
+saveRDS(data_out, file.path(outdir, "2018_national_nutrient_intake_inadequacy_estimates.Rds"))
+write.csv(data_out, file.path(outdir, "2018_national_nutrient_intake_inadequacy_estimates.Rds"), row.names=F)
+
 
 # Plot data
 ################################################################################
