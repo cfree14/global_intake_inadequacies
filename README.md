@@ -24,6 +24,11 @@ The data files containing the final subnational prevalence of inadequate nutrien
 * output/2018_subnational_nutrient_intake_inadequacy_estimates_simple.csv (for anyone)
 * output/2018_subnational_nutrient_intake_inadequacy_estimates_simple.Rds (for R progammers)
 
+The data files containing these values summarized at the national level are located here:
+
+* output/2018_national_nutrient_intake_inadequacy_estimates.csv (for anyone)
+* output/2018_national_nutrient_intake_inadequacy_estimates.Rds (for R progammers)
+
 Please email Simone Passarelli (simoneapassarelli@gmail.com) if you have any questions about the paper and Chris Free (cfree14@gmail.com) if you have any questions about the data, code, and/or repository.
 
 ## Related resources
