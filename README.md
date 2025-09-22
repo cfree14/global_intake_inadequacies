@@ -1,6 +1,6 @@
 # Estimating global nutrient intake adequacy
 
-This GitHub repository contains the data and code for the following paper in press:
+This GitHub repository contains the data and code for the following paper:
 
 * Passarelli S, Free CM,  Shepon A, Beal T, Batis C, Golden CD (2024) Global estimation of dietary micronutrient inadequacies: a modeling analysis. _The Lancet Global Health_ 12(10):e1590-e1599. [10.1016/S2214-109X(24)00276-6](10.1016/S2214-109X(24)00276-6)
 
