@@ -7,7 +7,7 @@ rm(list = ls())
 ################################################################################
 
 # Packages
-library(GENuS)
+#library(GENuS)
 library(tidyverse)
 
 # Directories
